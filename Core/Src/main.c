@@ -49,6 +49,7 @@
 #include "foc.h"
 #include "math_ops.h"
 #include "calibration.h"
+#include "version_info.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -178,7 +179,12 @@ int main(void)
   if(isnan(V_MAX)){V_MAX = 65.0f;}
   if(isnan(V_MIN)){V_MIN = -65.0f;}
 
-  printf("\r\nFirmware Version Number: %.2f\r\n", VERSION_NUM);
+//  printf("\r\nFirmware Version Number: %.2f\r\n", VERSION_NUM);
+  printf("\nFirmware Version:  %s\n", FIRMWARE_VERSION);
+  printf("\nBuild Date:  %s\n", FIRMWARE_DATE);
+  printf("Build Time:  %s\n", FIRMWARE_TIME);
+  printf("\nAuthor:  %s\n", AUTHOR_NAME);
+  printf("\nModification Info:  %s\n", MODIFICATION_INFO);
 
   /* Controller Setup */
   if(PHASE_ORDER){							// Timer channel to phase mapping
@@ -231,7 +237,7 @@ int main(void)
   drv_disable_gd(drv);
   HAL_Delay(1);
   //drv_enable_gd(drv);   */
-  printf("ADC A OFFSET: %d     ADC B OFFSET: %d\r\n", controller.adc_a_offset, controller.adc_b_offset);
+//  printf("ADC A OFFSET: %d     ADC B OFFSET: %d\r\n", controller.adc_a_offset, controller.adc_b_offset);
 
   /* Turn on PWM */
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
