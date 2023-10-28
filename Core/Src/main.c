@@ -157,27 +157,31 @@ int main(void)
   preference_writer_load(prefs);
 
   /* Sanitize configs in case flash is empty*/
-  if(E_ZERO==-1){E_ZERO = 0;}
-  if(M_ZERO==-1){M_ZERO = 0;}
-  if(isnan(I_BW) || I_BW==-1){I_BW = 1000;}
-  if(isnan(I_MAX) || I_MAX ==-1){I_MAX=40;}
-  if(isnan(I_FW_MAX) || I_FW_MAX ==-1){I_FW_MAX=0;}
-  if(CAN_ID==-1){CAN_ID = 1;}
-  if(CAN_MASTER==-1){CAN_MASTER = 0;}
-  if(CAN_TIMEOUT==-1){CAN_TIMEOUT = 1000;}
-  if(isnan(R_NOMINAL) || R_NOMINAL==-1){R_NOMINAL = 0.0f;}
-  if(isnan(TEMP_MAX) || TEMP_MAX==-1){TEMP_MAX = 125.0f;}
-  if(isnan(I_MAX_CONT) || I_MAX_CONT==-1){I_MAX_CONT = 14.0f;}
-  if(isnan(I_CAL)||I_CAL==-1){I_CAL = 5.0f;}
-  if(isnan(PPAIRS) || PPAIRS==-1){PPAIRS = 21.0f;}
-  if(isnan(GR) || GR==-1){GR = 1.0f;}
-  if(isnan(KT) || KT==-1){KT = 1.0f;}
-  if(isnan(KP_MAX) || KP_MAX==-1){KP_MAX = 500.0f;}
-  if(isnan(KD_MAX) || KD_MAX==-1){KD_MAX = 5.0f;}
-  if(isnan(P_MAX)){P_MAX = 12.5f;}
-  if(isnan(P_MIN)){P_MIN = -12.5f;}
-  if(isnan(V_MAX)){V_MAX = 65.0f;}
-  if(isnan(V_MIN)){V_MIN = -65.0f;}
+  if(E_ZERO==-1)                                   {E_ZERO = 0;}
+  if(M_ZERO==-1)                                   {M_ZERO = 0;}
+  if(isnan(GR) || GR==-1)                          {GR = 6.0f;}
+  if(isnan(KT) || KT==-1)                          {KT = 0.08f;}
+  if(isnan(I_BW) || I_BW==-1)                      {I_BW = 1000;}
+  if(isnan(I_MAX) || I_MAX ==-1)                   {I_MAX = 40;}
+  if(isnan(P_MAX))                                 {P_MAX = 6.283f;}
+  if(isnan(P_MIN))                                 {P_MIN = 0.0f;}
+  if(isnan(V_MAX))                                 {V_MAX = 45.0f;}
+  if(isnan(V_MIN))                                 {V_MIN = -45.0f;}
+  if(isnan(KP_MAX) || KP_MAX==-1)                  {KP_MAX = 500.0f;}
+  if(isnan(KI_MAX) || KI_MAX==-1)                  {KI_MAX = 0.0f;}
+  if(isnan(KD_MAX) || KD_MAX==-1)                  {KD_MAX = 5.0f;}
+  if(isnan(I_FW_MAX) || I_FW_MAX ==-1)             {I_FW_MAX = 0.0f;}
+  if(isnan(I_MAX_CONT) || I_MAX_CONT==-1)          {I_MAX_CONT = 14.0f;}
+  if(isnan(I_CAL) || I_CAL==-1)                    {I_CAL = 5.0f;}
+  if(HALL_CAL_DIR==-1)                             {HALL_CAL_DIR = 1;}
+  if(isnan(HALL_CAL_OFFSET) || HALL_CAL_OFFSET==-1){HALL_CAL_OFFSET = 0.0f;}
+  if(isnan(HALL_CAL_SPEED) || HALL_CAL_SPEED==-1)  {HALL_CAL_SPEED = 0;}
+  if(CAN_ID==-1)                                   {CAN_ID = 1;}
+  if(CAN_MASTER==-1)                               {CAN_MASTER = 0;}
+  if(CAN_TIMEOUT==-1)                              {CAN_TIMEOUT = 0;}
+  if(isnan(R_NOMINAL) || R_NOMINAL==-1)            {R_NOMINAL = 0.0f;}
+  if(isnan(TEMP_MAX) || TEMP_MAX==-1)              {TEMP_MAX = 125.0f;}
+  if(isnan(PPAIRS) || PPAIRS==-1)                  {PPAIRS = 21.0f;}
 
 //  printf("\r\nFirmware Version Number: %.2f\r\n", VERSION_NUM);
   printf("\nFirmware Version:  %s\n", FIRMWARE_VERSION);

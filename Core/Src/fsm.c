@@ -261,9 +261,9 @@
 	    printf(" %-4s %-31s %-5s %-6s %.3f\n\r", "l", "Current Limit (A)",                         "0.0", "75.0",   I_MAX);
 	    printf(" %-4s %-31s %-5s %-6s %.3f\n\r", "p", "Max Position Setpoint (rad)",               "-",   "-",      P_MAX);
 	    printf(" %-4s %-31s %-5s %-6s %.3f\n\r", "v", "Max Velocity Setpoint (rad)/s",             "-",   "-",      V_MAX);
-	    printf(" %-4s %-31s %-5s %-6s %.3f\n\r", "k", "Max Gain for Position (N-m/rad)",               "0.0", "1000.0", KP_MAX);
-	    printf(" %-4s %-31s %-5s %-6s %.3f\n\r", "i", "Max Integral Gain for Position (N-m*s/rad)", "0.0", "10.0",   KI_MAX);
-	    printf(" %-4s %-31s %-5s %-6s %.3f\n\r", "d", "Max Gain for Velocity (N-m/rad/s)",             "0.0", "5.0",    KD_MAX);
+	    printf(" %-4s %-31s %-5s %-6s %.3f\n\r", "k", "Max Gain for Position (N-m/rad)",           "0.0", "1000.0", KP_MAX);
+	    printf(" %-4s %-31s %-5s %-6s %.3f\n\r", "i", "Max Integral Gain for Position (N-m*s/rad)","0.0", "10.0",   KI_MAX);
+	    printf(" %-4s %-31s %-5s %-6s %.3f\n\r", "d", "Max Gain for Velocity (N-m/rad/s)",         "0.0", "5.0",    KD_MAX);
 	    printf(" %-4s %-31s %-5s %-6s %.3f\n\r", "f", "FW Current Limit (A)",                      "0.0", "33.0",   I_FW_MAX);
 //	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "h", "Temp Cutoff (C) (0 = none)",                "0",   "150",    TEMP_MAX);
 	    printf(" %-4s %-31s %-5s %-6s %.3f\n\r", "c", "Continuous Current (A)",                    "0.0", "40.0",   I_MAX_CONT);
