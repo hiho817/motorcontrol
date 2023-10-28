@@ -38,8 +38,12 @@ extern CAN_HandleTypeDef hcan1;
 //#define P_MAX 12.5f
 //#define V_MIN -65.0f
 //#define V_MAX 65.0f
+#define P_REPLY_MIN -15*2*PI_F
+#define P_REPLY_MAX 15*2*PI_F
 #define KP_MIN 0.0f
 //#define KP_MAX 500.0f
+#define KI_MIN 0.0f
+//#define KI_MAX 10.0f
 #define KD_MIN 0.0f
 //#define KD_MAX 5.0f
 #define T_MIN -18.0f

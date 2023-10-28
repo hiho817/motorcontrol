@@ -30,7 +30,10 @@ extern "C" {
 #define V_MIN					__float_reg[21]									// Velocity setpoint lower bound (rad/s)
 #define V_MAX					__float_reg[22]									// Velocity setpoint upper bound (rad/s)
 #define KP_MAX					__float_reg[23]									// Max position gain (N-m/rad)
-#define KD_MAX					__float_reg[24]									// Max velocity gain (N-m/rad/s)
+#define KI_MAX					__float_reg[24]
+#define KD_MAX					__float_reg[25]									// Max velocity gain (N-m/rad/s)
+#define HALL_CAL_OFFSET         __float_reg[26]
+#define HALL_CAL_SPEED          __float_reg[27]
 
 
 #define PHASE_ORDER             __int_reg[0]                                    // Phase swapping during calibration
@@ -40,7 +43,7 @@ extern "C" {
 #define M_ZERO					__int_reg[4]
 #define E_ZERO					__int_reg[5]
 #define ENCODER_LUT             __int_reg[6]                                    // Encoder offset LUT - 128 elements long
-
+#define HALL_CAL_DIR            __int_reg[7]
 
 
 

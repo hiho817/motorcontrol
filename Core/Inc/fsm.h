@@ -15,22 +15,24 @@ extern "C" {
 #include <stdint.h>
 
 
-
+// CAN and UART
 #define MENU_MODE           0
-#define CALIBRATION_MODE    1
+#define HALL_CALIBRATE      1
 #define MOTOR_MODE          2
+#define SET_ZERO            3
+// UART only
 #define SETUP_MODE          4
-#define ENCODER_MODE        5
-#define INIT_TEMP_MODE      6
+#define ENCODER_CALIBRATE   5
+#define ENCODER_MODE        6
 
 #define MENU_CMD			27
 #define MOTOR_CMD			'm'
-#define CAL_CMD				'c'
+#define ENCODER_CAL_CMD		'c'
 #define ENCODER_CMD			'e'
 #define SETUP_CMD			's'
 #define ZERO_CMD			'z'
 #define ENTER_CMD			13
-
+#define HALL_CAL_CMD		'h'
 
 
 typedef struct{
