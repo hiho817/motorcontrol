@@ -43,7 +43,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Core/Inc/position_sensor.h ../Core/Inc/preference_writer.h \
  ../Core/Inc/hw_config.h ../Core/Inc/user_config.h ../Core/Inc/fsm.h \
  ../Core/Inc/drv8323.h ../Core/Inc/foc.h ../Core/Inc/math_ops.h \
- ../Core/Inc/calibration.h
+ ../Core/Inc/calibration.h ../Core/Inc/version_info.h
 
 ../Core/Inc/main.h:
 
@@ -176,3 +176,5 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/math_ops.h:
 
 ../Core/Inc/calibration.h:
+
+../Core/Inc/version_info.h:
