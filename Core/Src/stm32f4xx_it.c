@@ -35,6 +35,7 @@
 #include "position_sensor.h"
 #include "hw_config.h"
 #include "user_config.h"
+#include "math_ops.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -237,6 +238,18 @@ void CAN1_RX0_IRQHandler(void)
   else if(((can_rx.data[0]==0xFF) & (can_rx.data[1]==0xFF) & (can_rx.data[2]==0xFF) & (can_rx.data[3]==0xFF) * (can_rx.data[4]==0xFF) & (can_rx.data[5]==0xFF) & (can_rx.data[6]==0xFF) & (can_rx.data[7]==0xFE))){
 	  update_fsm(&state, ZERO_CMD);
       }
+  else if(((can_rx.data[0]==0xFF) & (can_rx.data[1]==0xFF) & (can_rx.data[2]==0xFF) & (can_rx.data[3]==0xFF) * (can_rx.data[4]==0xFF) & (can_rx.data[5]==0xFF) & (can_rx.data[6]==0xFF) & (can_rx.data[7]==0xFA))){
+      hall_cal.hall_cal_count = 0;
+      hall_cal.hall_cal_state = 1; // calibrating
+      /*----- convert theta_mech to 0~359.9999deg -----*/
+      hall_cal.hall_present_pos = controller.theta_mech;
+      hall_cal.hall_cal_pcmd = controller.theta_mech;
+      static float _f_cal_round;
+      modff(hall_cal.hall_cal_pcmd/(2*PI_F),&_f_cal_round);
+      hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd - _f_cal_round*2*PI_F;
+      if(hall_cal.hall_cal_pcmd < 0) hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd + 2*PI_F;
+      update_fsm(&state, HALL_CAL_CMD);
+  	  }
   else{
 	  unpack_cmd(can_rx, controller.commands);	// Unpack commands
 	  controller.timeout = 0;					// Reset timeout counter
@@ -312,6 +325,18 @@ void can_tx_rx(void){
 		else if(((can_rx.data[0]==0xFF) & (can_rx.data[1]==0xFF) & (can_rx.data[2]==0xFF) & (can_rx.data[3]==0xFF) * (can_rx.data[4]==0xFF) & (can_rx.data[5]==0xFF) & (can_rx.data[6]==0xFF) & (can_rx.data[7]==0xFE))){
 			  update_fsm(&state, ZERO_CMD);
 			}
+		else if(((can_rx.data[0]==0xFF) & (can_rx.data[1]==0xFF) & (can_rx.data[2]==0xFF) & (can_rx.data[3]==0xFF) * (can_rx.data[4]==0xFF) & (can_rx.data[5]==0xFF) & (can_rx.data[6]==0xFF) & (can_rx.data[7]==0xFA))){
+		      hall_cal.hall_cal_count = 0;
+		      hall_cal.hall_cal_state = 1; // calibrating
+		      /*----- convert theta_mech to 0~359.9999deg -----*/
+		      hall_cal.hall_present_pos = controller.theta_mech;
+		      hall_cal.hall_cal_pcmd = controller.theta_mech;
+		      static float _f_cal_round;
+		      modff(hall_cal.hall_cal_pcmd/(2*PI_F),&_f_cal_round);
+		      hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd - _f_cal_round*2*PI_F;
+		      if(hall_cal.hall_cal_pcmd < 0) hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd + 2*PI_F;
+		      update_fsm(&state, HALL_CAL_CMD);
+		  	  }
 		else{
 			  unpack_cmd(can_rx, controller.commands);	// Unpack commands
 			  controller.timeout = 0;					// Reset timeout counter
