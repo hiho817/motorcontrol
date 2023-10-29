@@ -13,10 +13,10 @@
 
 uint16_t drv_spi_write(DRVStruct * drv, uint16_t val){
 	drv->spi_tx_word = val;
-	HAL_GPIO_WritePin(DRV_CS, GPIO_PIN_RESET ); 	// CS low
+	DRV_CS_LOW 	// CS low
 	HAL_SPI_TransmitReceive(&DRV_SPI, (uint8_t*)drv->spi_tx_buff, (uint8_t *)drv->spi_rx_buff, 1, 100);
 	while( DRV_SPI.State == HAL_SPI_STATE_BUSY );  					// wait for transmission complete
-	HAL_GPIO_WritePin(DRV_CS, GPIO_PIN_SET ); 	// CS high
+	DRV_CS_HIGH 	// CS high
 	return drv->spi_rx_word;
 }
 uint16_t drv_read_FSR1(DRVStruct drv){

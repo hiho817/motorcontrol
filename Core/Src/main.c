@@ -234,8 +234,8 @@ int main(void)
   HAL_ADC_Start(&hadc3);
 
   /* DRV8323 setup */
-  HAL_GPIO_WritePin(DRV_CS, GPIO_PIN_SET ); 	// CS high
-  HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET );
+  DRV_CS_HIGH 	// CS high
+  GPIO_ENABLE   // GPIO ENABLE_PIN HIGH
   HAL_Delay(1);
   drv_calibrate(drv);
   HAL_Delay(1);
@@ -246,7 +246,7 @@ int main(void)
   drv_write_OCPCR(drv, TRETRY_4MS, DEADTIME_200NS, OCP_RETRY, OCP_DEG_8US, VDS_LVL_1_88);
   zero_current(&controller);
   drv_enable_gd(drv);
-  HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET );
+  GPIO_DISABLE
 //  printf("ADC A OFFSET: %d     ADC B OFFSET: %d\r\n", controller.adc_a_offset, controller.adc_b_offset);
 
   /* Turn on PWM */

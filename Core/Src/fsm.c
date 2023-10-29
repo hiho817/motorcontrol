@@ -125,7 +125,7 @@
 				comm_encoder.e_zero = 0;
 				memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));
 				drv_enable_gd(drv);
-				HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET );
+				GPIO_ENABLE
 				break;
 			case HALL_CALIBRATE:
 				printf("Entering Hall Calibration Mode\r\n");
@@ -159,14 +159,14 @@
 				fsmstate->ready = 1;
 				drv_disable_gd(drv);
 				reset_foc(&controller);
-				HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET);
-				HAL_GPIO_WritePin(LED, GPIO_PIN_RESET );
+				GPIO_DISABLE
+				LED_LOW
 				//}
 				zero_commands(&controller);		// Set commands to zero
 				break;
 			case ENCODER_CALIBRATE:
 				printf("Exiting Encoder Calibration Mode\r\n");
-				HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET);
+				GPIO_DISABLE
 				drv_disable_gd(drv);
 				//free(error_array);
 				//free(lut_array);
@@ -175,7 +175,7 @@
 				break;
 			case HALL_CALIBRATE:
 				printf("Exiting Hall Calibration Mode\r\n");
-				HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET);
+				GPIO_DISABLE
 				drv_disable_gd(drv);
 				fsmstate->ready = 1;
 				break;
@@ -407,8 +407,8 @@
 	if(_f_p_des < 0) _f_p_des = _f_p_des + 2*PI_F;
 	controller.p_des = _f_p_des;
 
-	HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(LED, GPIO_PIN_SET );
+	GPIO_ENABLE
+	LED_HIGH
 	reset_foc(&controller);
 	drv_enable_gd(drv);
  }
