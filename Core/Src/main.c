@@ -64,7 +64,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
-#define VERSION_NUM 2.0f
+//#define VERSION_NUM 2.0f -> defined in main.h (because CAN pack_reply needs to use)
 
 
 /* USER CODE END PM */

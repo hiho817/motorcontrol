@@ -66,13 +66,13 @@ typedef struct{
 
 typedef struct{
 	uint8_t id;
-	uint8_t data[7];
+	uint8_t data[8];
 	CAN_TxHeaderTypeDef tx_header;
 }CANTxMessage ;
 
 void can_rx_init(CANRxMessage *msg);
 void can_tx_init(CANTxMessage *msg);
-void pack_reply(CANTxMessage *msg, uint8_t id, float p, float v, float t, float vb);
+void pack_reply(CANTxMessage *msg, float p, float v, float t, int version, int calibrate_finish, int state, float iq_ref);
 void unpack_cmd(CANRxMessage msg, float *commands);
 /* USER CODE END Prototypes */
 

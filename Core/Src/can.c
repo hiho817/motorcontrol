@@ -151,18 +151,19 @@ void can_tx_init(CANTxMessage *msg){
 /// 2: [velocity[11-4]]
 /// 3: [velocity[3-0], current[11-8]]
 /// 4: [current[7-0]]
-void pack_reply(CANTxMessage *msg, uint8_t id, float p, float v, float t, float vb){
+void pack_reply(CANTxMessage *msg, float p, float v, float t, int version, int calibrate_finish, int state, float iq_ref){
     int p_int = float_to_uint(p, P_MIN, P_MAX, 16);
     int v_int = float_to_uint(v, V_MIN, V_MAX, 12);
     int t_int = float_to_uint(t, -(I_MAX+SENSE_BUFFER)*KT*GR, (I_MAX+SENSE_BUFFER)*KT*GR, 12);
-    int vb_int = float_to_uint(vb, VB_MIN, VB_MAX, 8);
-    msg->data[0] = id;
+
+    msg->data[0] = CAN_ID;
     msg->data[1] = p_int>>8;
     msg->data[2] = p_int&0xFF;
     msg->data[3] = v_int>>4;
     msg->data[4] = ((v_int&0xF)<<4) + (t_int>>8);
     msg->data[5] = t_int&0xFF;
-    msg->data[6] = vb_int;
+    msg->data[6] = (version<<4) + (calibrate_finish&0xF);
+    msg->data[7] = state;
     }
 
 /// CAN Command Packet Structure ///
@@ -183,14 +184,14 @@ void pack_reply(CANTxMessage *msg, uint8_t id, float p, float v, float t, float 
 /// 7: [torque[7-0]]
 void unpack_cmd(CANRxMessage msg, float *commands){// ControllerStruct * controller){
         int p_int = (msg.data[0]<<8)|msg.data[1];
-        int v_int = (msg.data[2]<<4)|(msg.data[3]>>4);
-        int kp_int = ((msg.data[3]&0xF)<<8)|msg.data[4];
+        int kp_int = (msg.data[2]<<4)|(msg.data[3]>>4);
+        int ki_int = ((msg.data[3]&0xF)<<8)|msg.data[4];
         int kd_int = (msg.data[5]<<4)|(msg.data[6]>>4);
         int t_int = ((msg.data[6]&0xF)<<8)|msg.data[7];
 
         commands[0] = uint_to_float(p_int, P_MIN, P_MAX, 16);
-        commands[1] = uint_to_float(v_int, V_MIN, V_MAX, 12);
-        commands[2] = uint_to_float(kp_int, KP_MIN, KP_MAX, 12);
+        commands[1] = uint_to_float(kp_int, KP_MIN, KP_MAX, 12);
+        commands[2] = uint_to_float(ki_int, KI_MIN, KI_MAX, 12);
         commands[3] = uint_to_float(kd_int, KD_MIN, KD_MAX, 12);
         commands[4] = uint_to_float(t_int, -I_MAX*KT*GR, I_MAX*KT*GR, 12);
     //printf("Received   ");

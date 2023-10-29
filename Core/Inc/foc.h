@@ -38,7 +38,7 @@ typedef struct{
     union{
     	float commands[5];									// Making this easier to pass around without including foc.h everywhere
     	struct{
-    		float p_des, v_des, kp, kd, t_ff;                   // Desired position, velocity, gains, torque
+    		float p_des, kp, ki, kd, t_ff, v_des;                   // Desired position, gains, torque, velocity
     	};
     };
     float v_max, v_ref, fw_int, v_margin;                                    // output voltage magnitude, field-weakening integral
