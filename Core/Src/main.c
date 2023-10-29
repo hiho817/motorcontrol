@@ -91,6 +91,7 @@ DRVStruct drv;
 CalStruct comm_encoder_cal;
 CANTxMessage can_tx;
 CANRxMessage can_rx;
+HallCalStruct hall_cal;
 
 /* init but don't allocate calibration arrays */
 int *error_array = NULL;
@@ -202,6 +203,19 @@ int main(void)
 
   /* calibration "encoder" zeroing */
   memset(&comm_encoder_cal.cal_position, 0, sizeof(EncoderStruct));
+
+  /* initialize the parameters of hall sensor */
+  hall_cal.hall_input = 1;
+  hall_cal.hall_preinput = 1;
+  hall_cal.hall_cal_pcmd = 0;
+  hall_cal.hall_cal_speed = 0.25; // rad/s
+  hall_cal.hall_present_pos = 0; // calibrate the previous position of encoder
+  hall_cal.hall_in_pos = 0;  // read the position from 1 to 0 (magnet enters the area of hall sensor)
+  hall_cal.hall_out_pos = 0; // read the position from 0 to 1 (magnet exits the area of hall sensor)
+  hall_cal.hall_mid_pos = 0;
+  hall_cal. hall_cal_offset = 0; // rad
+  hall_cal.hall_cal_count = 0;
+  hall_cal.hall_cal_state = 0;
 
   /* commutation encoder setup */
   comm_encoder.m_zero = M_ZERO;
