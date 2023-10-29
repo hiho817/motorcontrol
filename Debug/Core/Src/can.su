@@ -3,5 +3,5 @@ can.c:64:6:HAL_CAN_MspInit	48	static
 can.c:97:6:HAL_CAN_MspDeInit	16	static
 can.c:124:6:can_rx_init	16	static
 can.c:136:6:can_tx_init	16	static
-can.c:154:6:pack_reply	48	static
-can.c:184:6:unpack_cmd	40	static
+can.c:154:6:pack_reply	56	static
+can.c:185:6:unpack_cmd	40	static
