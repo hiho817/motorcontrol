@@ -288,12 +288,39 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
 
 
 void torque_control(ControllerStruct *controller){
-	controller->t_ff_filt = 0.9f*controller->t_ff_filt + 0.1f*controller->t_ff;
-    float torque_des = controller->kp*(controller->p_des - controller->theta_mech) + controller->t_ff_filt + controller->kd*(controller->v_des - controller->dtheta_mech);
-    controller->i_q_des = fast_fmaxf(fast_fminf(torque_des/(KT*GR), controller->i_max), -controller->i_max);
-    if(controller->v_bus > V_BUS_MAX){controller->i_q_des = 0;}
-    controller->i_d_des = 0.0f;
+	/*----- convert theta_mech to 0~359.9999deg -----*/
+	static float pos, round;
+	pos = controller->theta_mech;
+	modff(pos/(2*PI_F),&round);
+	pos = pos - round*2*PI_F;
+	if(pos < 0){
+		pos = pos + 2*PI_F;
+	}
 
+	/*----- position PID control -----*/
+	static float in_err = 0, err = 0; //integral of position error
+	if(controller->p_des < pos){
+		if((controller->p_des + 2*PI_F - pos) < (pos - controller->p_des)){
+			err = 2*PI_F - pos + controller->p_des;
+		}
+		else{
+			err = controller->p_des - pos;
+		}
+	}
+	else{
+		if((pos + 2*PI_F - controller->p_des) < (controller->p_des - pos)){
+			err = controller->p_des - 2*PI_F - pos;
+		}
+		else{
+			err = controller->p_des - pos;
+		}
+	}
+	in_err = in_err + err;
+
+    float torque_ref = controller->kp*(err) + controller->t_ff + controller->ki*(in_err) + controller->kd*(-controller->dtheta_mech);
+    controller->i_q_des = torque_ref/(KT*GR);
+	controller->i_d_des = 0.0f;
+    
     }
 
 
@@ -301,6 +328,7 @@ void torque_control(ControllerStruct *controller){
 void zero_commands(ControllerStruct * controller){
 	controller->t_ff = 0;
 	controller->kp = 0;
+	controller->ki = 0;
 	controller->kd = 0;
 	controller->p_des = 0;
 	controller->v_des = 0;
