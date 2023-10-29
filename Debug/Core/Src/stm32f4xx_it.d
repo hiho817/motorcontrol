@@ -41,7 +41,7 @@ Core/Src/stm32f4xx_it.o: ../Core/Src/stm32f4xx_it.c ../Core/Inc/main.h \
  ../Core/Inc/usart.h ../Core/Inc/fsm.h ../Core/Inc/spi.h \
  ../Core/Inc/gpio.h ../Core/Inc/adc.h ../Core/Inc/foc.h ../Core/Inc/can.h \
  ../Core/Inc/position_sensor.h ../Core/Inc/hw_config.h \
- ../Core/Inc/user_config.h
+ ../Core/Inc/user_config.h ../Core/Inc/math_ops.h
 
 ../Core/Inc/main.h:
 
@@ -162,3 +162,5 @@ Core/Src/stm32f4xx_it.o: ../Core/Src/stm32f4xx_it.c ../Core/Inc/main.h \
 ../Core/Inc/hw_config.h:
 
 ../Core/Inc/user_config.h:
+
+../Core/Inc/math_ops.h:
