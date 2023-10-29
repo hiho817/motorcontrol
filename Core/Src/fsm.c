@@ -80,6 +80,16 @@
 			 break;
 
 		 case HALL_CALIBRATE:
+			 /* If CAN has timed out, reset all commands */
+			 if((CAN_TIMEOUT > 0 ) && (controller.timeout > CAN_TIMEOUT)){
+				 zero_commands(&controller);
+			 }
+			 /* Otherwise, commutate */
+			 
+			 torque_control(&controller);
+			 commutate(&controller, &comm_encoder);
+
+			 controller.timeout ++;
 			 break;
 	 }
 
@@ -91,25 +101,22 @@
 
 		switch(fsmstate->state){
 				case MENU_MODE:
-				//printf("Entering Main Menu\r\n");
+				printf("Entering Main Menu\r\n");
 				enter_menu_state();
 				break;
 			case SETUP_MODE:
-				//printf("Entering Setup\r\n");
+				printf("Entering Setup\r\n");
 				enter_setup_state();
 				break;
 			case ENCODER_MODE:
-				//printf("Entering Encoder Mode\r\n");
+				printf("Entering Encoder Mode\r\n");
 				break;
 			case MOTOR_MODE:
-
-				//printf("Entering Motor Mode\r\n");
-				HAL_GPIO_WritePin(LED, GPIO_PIN_SET );
-				reset_foc(&controller);
-				drv_enable_gd(drv);
+				printf("Entering Motor Mode\r\n");
+				enter_motor_mode();
 				break;
 			case ENCODER_CALIBRATE:
-				//printf("Entering Calibration Mode\r\n");
+				printf("Entering Encoder Calibration Mode\r\n");
 				/* zero out all calibrations before starting */
 
 				comm_encoder_cal.done_cal = 0;
@@ -118,8 +125,11 @@
 				comm_encoder.e_zero = 0;
 				memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));
 				drv_enable_gd(drv);
+				HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET );
 				break;
 			case HALL_CALIBRATE:
+				printf("Entering Hall Calibration Mode\r\n");
+				enter_motor_mode();
 				break;
 
 		}
@@ -131,30 +141,32 @@
 
 		switch(fsmstate->state){
 			case MENU_MODE:
-				//printf("Leaving Main Menu\r\n");
+				printf("Leaving Main Menu\r\n");
 				fsmstate->ready = 1;
 				break;
 			case SETUP_MODE:
-				//printf("Leaving Setup Menu\r\n");
+				printf("Leaving Setup Menu\r\n");
 				fsmstate->ready = 1;
 				break;
 			case ENCODER_MODE:
-				//printf("Leaving Encoder Mode\r\n");
+				printf("Leaving Encoder Mode\r\n");
 				fsmstate->ready = 1;
 				break;
 			case MOTOR_MODE:
 				/* Don't stop commutating if there are high currents or FW happening */
 				//if( (fabs(controller.i_q_filt)<1.0f) && (fabs(controller.i_d_filt)<1.0f) ){
-					fsmstate->ready = 1;
-					drv_disable_gd(drv);
-					reset_foc(&controller);
-					//printf("Leaving Motor Mode\r\n");
-					HAL_GPIO_WritePin(LED, GPIO_PIN_RESET );
+				printf("Leaving Motor Mode\r\n");
+				fsmstate->ready = 1;
+				drv_disable_gd(drv);
+				reset_foc(&controller);
+				HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(LED, GPIO_PIN_RESET );
 				//}
 				zero_commands(&controller);		// Set commands to zero
 				break;
 			case ENCODER_CALIBRATE:
-				//printf("Exiting Calibration Mode\r\n");
+				printf("Exiting Encoder Calibration Mode\r\n");
+				HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET);
 				drv_disable_gd(drv);
 				//free(error_array);
 				//free(lut_array);
@@ -162,6 +174,10 @@
 				fsmstate->ready = 1;
 				break;
 			case HALL_CALIBRATE:
+				printf("Exiting Hall Calibration Mode\r\n");
+				HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET);
+				drv_disable_gd(drv);
+				fsmstate->ready = 1;
 				break;
 		}
 
@@ -207,6 +223,8 @@
 					printf("\n\r  Saved new zero position:  %d\n\r\n\r", M_ZERO);
 					break;
 				case HALL_CAL_CMD:
+					fsmstate->next_state = HALL_CALIBRATE;
+					fsmstate->ready = 0;
 					break;
 				}
 			break;
@@ -382,6 +400,16 @@
  }
 
  void enter_motor_mode(void){
+	float _f_round, _f_p_des;
+	_f_p_des = controller.theta_mech;
+	modff(_f_p_des/(2*PI_F),&_f_round);
+	_f_p_des = _f_p_des - _f_round*2*PI_F;
+	if(_f_p_des < 0) _f_p_des = _f_p_des + 2*PI_F;
+	controller.p_des = _f_p_des;
 
+	HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(LED, GPIO_PIN_SET );
+	reset_foc(&controller);
+	drv_enable_gd(drv);
  }
 
