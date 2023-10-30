@@ -42,8 +42,8 @@ extern "C" {
 #define CAN_TIMEOUT             __int_reg[3]                                    // CAN bus timeout period
 #define M_ZERO					__int_reg[4]
 #define E_ZERO					__int_reg[5]
-#define ENCODER_LUT             __int_reg[6]                                    // Encoder offset LUT - 128 elements long
-#define HALL_CAL_DIR            __int_reg[7]
+#define HALL_CAL_DIR            __int_reg[6]
+#define ENCODER_LUT             __int_reg[7]                                    // Encoder offset LUT - 128 elements long
 
 
 
