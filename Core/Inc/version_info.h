@@ -13,6 +13,6 @@
 #define FIRMWARE_TIME      __TIME__
 #define AUTHOR_NAME        "Yi-Syuan, Shen (r12522823)"
 
-#define MODIFICATION_INFO  "Test all the modes and functions with debug board"
+#define MODIFICATION_INFO  "Fix the bug of position reply through CAN"
 
 #endif /* VERSION_INFO_H_ */

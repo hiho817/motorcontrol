@@ -152,7 +152,7 @@ void can_tx_init(CANTxMessage *msg){
 /// 3: [velocity[3-0], current[11-8]]
 /// 4: [current[7-0]]
 void pack_reply(CANTxMessage *msg, float p, float v, float t, int version, int calibrate_finish, int state, float iq_ref){
-    int p_int = float_to_uint(p, P_MIN, P_MAX, 16);
+    int p_int = float_to_uint(p, P_REPLY_MIN, P_REPLY_MAX, 16);
     int v_int = float_to_uint(v, V_MIN, V_MAX, 12);
     int t_int = float_to_uint(t, -(I_MAX+SENSE_BUFFER)*KT*GR, (I_MAX+SENSE_BUFFER)*KT*GR, 12);
 
