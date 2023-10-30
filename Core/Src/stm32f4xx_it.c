@@ -264,7 +264,7 @@ void CAN1_RX0_IRQHandler(void)
 void TIM1_UP_TIM10_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 0 */
-	//HAL_GPIO_WritePin(LED, GPIO_PIN_SET );	// Useful for timing
+	//LED_HIGH	// Useful for timing
 
 	/* Sample ADCs */
 	analog_sample(&controller);
@@ -283,7 +283,7 @@ void TIM1_UP_TIM10_IRQHandler(void)
 
 	/* increment loop count */
 	controller.loop_count++;
-	//HAL_GPIO_WritePin(LED, GPIO_PIN_RESET );
+	//LED_LOW
 
   /* USER CODE END TIM1_UP_TIM10_IRQn 0 */
   HAL_TIM_IRQHandler(&htim1);
