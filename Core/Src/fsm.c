@@ -85,7 +85,10 @@
 				 zero_commands(&controller);
 			 }
 			 /* Otherwise, commutate */
-			 
+
+			 /* Calibrate Hall Sensor */
+			 hall_calibrate();
+
 			 torque_control(&controller);
 			 commutate(&controller, &comm_encoder);
 
@@ -125,10 +128,13 @@
 				comm_encoder.e_zero = 0;
 				memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));
 				drv_enable_gd(drv);
-				GPIO_ENABLE
+				GPIO_ENABLE;
 				break;
 			case HALL_CALIBRATE:
 				printf("Entering Hall Calibration Mode\r\n");
+				controller.kp = 5.0f ;
+				controller.ki = 0.0f ;
+				controller.kd = 1.0f ;
 				enter_motor_mode();
 				break;
 
@@ -159,14 +165,14 @@
 				fsmstate->ready = 1;
 				drv_disable_gd(drv);
 				reset_foc(&controller);
-				GPIO_DISABLE
-				LED_LOW
+				GPIO_DISABLE;
+				LED_LOW;
 				//}
 				zero_commands(&controller);		// Set commands to zero
 				break;
 			case ENCODER_CALIBRATE:
 				printf("Exiting Encoder Calibration Mode\r\n");
-				GPIO_DISABLE
+				GPIO_DISABLE;
 				drv_disable_gd(drv);
 				//free(error_array);
 				//free(lut_array);
@@ -175,7 +181,7 @@
 				break;
 			case HALL_CALIBRATE:
 				printf("Exiting Hall Calibration Mode\r\n");
-				GPIO_DISABLE
+				GPIO_DISABLE;
 				drv_disable_gd(drv);
 				fsmstate->ready = 1;
 				break;
@@ -407,9 +413,96 @@
 	if(_f_p_des < 0) _f_p_des = _f_p_des + 2*PI_F;
 	controller.p_des = _f_p_des;
 
-	GPIO_ENABLE
-	LED_HIGH
+	GPIO_ENABLE;
+	LED_HIGH;
 	reset_foc(&controller);
 	drv_enable_gd(drv);
+ }
+
+
+ void hall_calibrate(void){
+     if(hall_cal.hall_cal_state == 0 || hall_cal.hall_cal_state >= 2 );
+     else{
+         // read hall sensor
+     	hall_cal.hall_input = HAL_GPIO_ReadPin(HALL_IO);
+         // calculate new position
+         if((HALL_CAL_DIR == 1 && controller.theta_mech >= hall_cal.hall_present_pos + 2*PI_F) || (HALL_CAL_DIR == -1 && controller.theta_mech <= hall_cal.hall_present_pos - 2*PI_F)){
+         	hall_cal.hall_cal_state = 3 ;
+             state.state = MENU_MODE ;
+             state.state_change = 1 ;
+         }
+         else{
+         	// rotate the motor forward and backward to read the hall sensor (1: no magnet detected, 0: magnet detected)
+         	// record the position at the moment from 1 to 0 (in_pos), and keep rotating
+             // record the position at the moment from 0 to 1 (out_pos), and stop rotating.
+         	// calculate the average value of in_pos and out_pos, and rotate the motor to that position slowly
+             if(hall_cal.hall_input != hall_cal.hall_preinput ) {
+             	hall_cal.hall_cal_count += 1 ;
+                 if(hall_cal.hall_input == 0) hall_cal.hall_in_pos = controller.theta_mech ;
+                 else{
+                 	hall_cal.hall_out_pos = controller.theta_mech ;
+                 	hall_cal.hall_mid_pos = (hall_cal.hall_in_pos + hall_cal.hall_out_pos)/2.0f ;
+                 }
+             }
+             if(hall_cal.hall_cal_count <= 1) hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd + HALL_CAL_DIR*(1.0f/(40000.0f)*HALL_CAL_SPEED ) ;
+             else{
+                 if(HALL_CAL_DIR == 1 ){
+                     if(HALL_CAL_OFFSET == 0){
+                         // keep turning
+                         if(controller.theta_mech >= hall_cal.hall_mid_pos) hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd - HALL_CAL_DIR*1.0f/40000.0f*HALL_CAL_SPEED ;
+                         else{
+                         	// stop
+                         	hall_cal.hall_cal_pcmd = 0.0f;
+                         	hall_cal.hall_cal_state = 2; // success
+                             // zero
+                             hall_cal.hall_cal_count = 0 ;
+                             state.state = MOTOR_MODE;
+                         }
+                     }
+                     else{
+                         if(controller.theta_mech <= hall_cal.hall_mid_pos + HALL_CAL_OFFSET*PI_F/180)  hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd + HALL_CAL_DIR*1.0f/40000.0f*HALL_CAL_SPEED ;
+                         else{
+                         	// stop
+                         	hall_cal.hall_cal_pcmd = 0.0f;
+                         	hall_cal.hall_cal_state = 2; // success
+                             // zero
+                             hall_cal.hall_cal_count = 0 ;
+                             state.state = MOTOR_MODE;
+                         }
+                     }
+                 }
+                 else if(HALL_CAL_DIR == -1){
+                     if(HALL_CAL_OFFSET == 0){
+                         // keep turning
+                         if(controller.theta_mech <= hall_cal.hall_mid_pos) hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd - HALL_CAL_DIR*1.0f/40000.0f*HALL_CAL_SPEED ;
+                         else{
+                         	// stop
+                         	hall_cal.hall_cal_pcmd = 0.0f;
+                         	hall_cal.hall_cal_state = 2; // success
+                             // zero
+                             hall_cal.hall_cal_count = 0 ;
+                             state.state = MOTOR_MODE;
+                         }
+                     }
+                     else{
+                     	// calibrate_offset != 0
+                         if(controller.theta_mech >= hall_cal.hall_mid_pos - HALL_CAL_OFFSET*PI_F/180)  hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd + HALL_CAL_DIR*1.0f/40000.0f*HALL_CAL_SPEED ;
+                         else{
+                         	// stop
+                         	hall_cal.hall_cal_pcmd = 0.0f;
+                         	hall_cal.hall_cal_state = 2; // success
+                             // zero
+                             hall_cal.hall_cal_count = 0 ;
+                             state.state = MOTOR_MODE;
+                         }
+                     }
+                 }
+             }
+             hall_cal.hall_cal_pcmd = (hall_cal.hall_cal_pcmd>2*PI_F) ? hall_cal.hall_cal_pcmd-=2*PI_F : hall_cal.hall_cal_pcmd ;
+             hall_cal.hall_cal_pcmd = (hall_cal.hall_cal_pcmd < 0)  ? hall_cal.hall_cal_pcmd+=2*PI_F : hall_cal.hall_cal_pcmd ;
+             controller.p_des = hall_cal.hall_cal_pcmd ;
+         }
+         hall_cal.hall_preinput = hall_cal.hall_input ;
+     }
  }
 
