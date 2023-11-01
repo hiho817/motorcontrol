@@ -176,7 +176,7 @@ int main(void)
   if(isnan(I_CAL) || I_CAL==-1)                    {I_CAL = 5.0f;}
   if(HALL_CAL_DIR==-1)                             {HALL_CAL_DIR = 1;}
   if(isnan(HALL_CAL_OFFSET) || HALL_CAL_OFFSET==-1){HALL_CAL_OFFSET = 0.0f;}
-  if(isnan(HALL_CAL_SPEED) || HALL_CAL_SPEED==-1)  {HALL_CAL_SPEED = 0;}
+  if(isnan(HALL_CAL_SPEED) || HALL_CAL_SPEED==-1)  {HALL_CAL_SPEED = 0.25f;}
   if(CAN_ID==-1)                                   {CAN_ID = 1;}
   if(CAN_MASTER==-1)                               {CAN_MASTER = 0;}
   if(CAN_TIMEOUT==-1)                              {CAN_TIMEOUT = 0;}
@@ -234,8 +234,8 @@ int main(void)
   HAL_ADC_Start(&hadc3);
 
   /* DRV8323 setup */
-  DRV_CS_HIGH 	// CS high
-  GPIO_ENABLE   // GPIO ENABLE_PIN HIGH
+  DRV_CS_HIGH; 	// CS high
+  GPIO_ENABLE;   // GPIO ENABLE_PIN HIGH
   HAL_Delay(1);
   drv_calibrate(drv);
   HAL_Delay(1);
@@ -246,7 +246,7 @@ int main(void)
   drv_write_OCPCR(drv, TRETRY_4MS, DEADTIME_200NS, OCP_RETRY, OCP_DEG_8US, VDS_LVL_1_88);
   zero_current(&controller);
   drv_enable_gd(drv);
-  GPIO_DISABLE
+  GPIO_DISABLE;
 //  printf("ADC A OFFSET: %d     ADC B OFFSET: %d\r\n", controller.adc_a_offset, controller.adc_b_offset);
 
   /* Turn on PWM */
