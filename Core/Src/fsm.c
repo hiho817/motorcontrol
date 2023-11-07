@@ -87,7 +87,7 @@
 			 /* Otherwise, commutate */
 
 			 /* Calibrate Hall Sensor */
-			 hall_calibrate();
+			 hall_calibrate(fsmstate);
 
 			 torque_control(&controller);
 			 commutate(&controller, &comm_encoder);
@@ -423,80 +423,79 @@
  }
 
 
- void hall_calibrate(void){
+ void hall_calibrate(FSMStruct * fsmstate){
      if(hall_cal.hall_cal_state == 0 || hall_cal.hall_cal_state >= 2 );
      else{
-         // read hall sensor
-     	hall_cal.hall_input = HAL_GPIO_ReadPin(HALL_IO);
-         // calculate new position
-         if((HALL_CAL_DIR == 1 && controller.theta_mech >= hall_cal.hall_present_pos + 2*PI_F) || (HALL_CAL_DIR == -1 && controller.theta_mech <= hall_cal.hall_present_pos - 2*PI_F)){
-         	hall_cal.hall_cal_state = 3 ;
-             state.state = MENU_MODE ;
-             state.state_change = 1 ;
-         }
+    	 // read hall sensor
+    	 hall_cal.hall_input = HAL_GPIO_ReadPin(HALL_IO);
+    	 // calculate new position
+    	 if((HALL_CAL_DIR == 1 && controller.theta_mech >= hall_cal.hall_present_pos + 2*PI_F) || (HALL_CAL_DIR == -1 && controller.theta_mech <= hall_cal.hall_present_pos - 2*PI_F)){
+    		 hall_cal.hall_cal_state = 3 ;
+    		 fsmstate->next_state = MENU_MODE ;
+    	 }
          else{
-         	// rotate the motor forward and backward to read the hall sensor (1: no magnet detected, 0: magnet detected)
-         	// record the position at the moment from 1 to 0 (in_pos), and keep rotating
-             // record the position at the moment from 0 to 1 (out_pos), and stop rotating.
-         	// calculate the average value of in_pos and out_pos, and rotate the motor to that position slowly
-             if(hall_cal.hall_input != hall_cal.hall_preinput ) {
-             	hall_cal.hall_cal_count += 1 ;
-                 if(hall_cal.hall_input == 0) hall_cal.hall_in_pos = controller.theta_mech ;
-                 else{
-                 	hall_cal.hall_out_pos = controller.theta_mech ;
-                 	hall_cal.hall_mid_pos = (hall_cal.hall_in_pos + hall_cal.hall_out_pos)/2.0f ;
+        	 // rotate the motor forward and backward to read the hall sensor (1: no magnet detected, 0: magnet detected)
+        	 // record the position at the moment from 1 to 0 (in_pos), and keep rotating
+        	 // record the position at the moment from 0 to 1 (out_pos), and stop rotating.
+        	 // calculate the average value of in_pos and out_pos, and rotate the motor to that position slowly
+        	 if(hall_cal.hall_input != hall_cal.hall_preinput ) {
+        		 hall_cal.hall_cal_count += 1 ;
+        		 if(hall_cal.hall_input == 0) hall_cal.hall_in_pos = controller.theta_mech ;
+        		 else{
+        			 hall_cal.hall_out_pos = controller.theta_mech ;
+        			 hall_cal.hall_mid_pos = (hall_cal.hall_in_pos + hall_cal.hall_out_pos)/2.0f ;
                  }
              }
              if(hall_cal.hall_cal_count <= 1) hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd + HALL_CAL_DIR*(1.0f/(40000.0f)*HALL_CAL_SPEED ) ;
              else{
                  if(HALL_CAL_DIR == 1 ){
                      if(HALL_CAL_OFFSET == 0){
-                         // keep turning
-                         if(controller.theta_mech >= hall_cal.hall_mid_pos) hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd - HALL_CAL_DIR*1.0f/40000.0f*HALL_CAL_SPEED ;
-                         else{
-                         	// stop
-                         	hall_cal.hall_cal_pcmd = 0.0f;
-                         	hall_cal.hall_cal_state = 2; // success
+                    	 // keep turning
+                    	 if(controller.theta_mech >= hall_cal.hall_mid_pos) hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd - HALL_CAL_DIR*1.0f/40000.0f*HALL_CAL_SPEED ;
+                    	 else{
+                    		 // stop
+                    		 hall_cal.hall_cal_pcmd = 0.0f;
+                    		 hall_cal.hall_cal_state = 2; // success
                              // zero
-                             hall_cal.hall_cal_count = 0 ;
-                             state.state = MOTOR_MODE;
+                    		 hall_cal.hall_cal_count = 0 ;
+                    		 fsmstate->next_state = MOTOR_MODE ;
                          }
                      }
                      else{
                          if(controller.theta_mech <= hall_cal.hall_mid_pos + HALL_CAL_OFFSET*PI_F/180)  hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd + HALL_CAL_DIR*1.0f/40000.0f*HALL_CAL_SPEED ;
                          else{
-                         	// stop
-                         	hall_cal.hall_cal_pcmd = 0.0f;
-                         	hall_cal.hall_cal_state = 2; // success
+                        	 // stop
+                        	 hall_cal.hall_cal_pcmd = 0.0f;
+                        	 hall_cal.hall_cal_state = 2; // success
                              // zero
                              hall_cal.hall_cal_count = 0 ;
-                             state.state = MOTOR_MODE;
+                    		 fsmstate->next_state = MOTOR_MODE ;
                          }
                      }
                  }
                  else if(HALL_CAL_DIR == -1){
                      if(HALL_CAL_OFFSET == 0){
-                         // keep turning
+                    	 // keep turning
                          if(controller.theta_mech <= hall_cal.hall_mid_pos) hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd - HALL_CAL_DIR*1.0f/40000.0f*HALL_CAL_SPEED ;
                          else{
-                         	// stop
-                         	hall_cal.hall_cal_pcmd = 0.0f;
-                         	hall_cal.hall_cal_state = 2; // success
+                        	 // stop
+                        	 hall_cal.hall_cal_pcmd = 0.0f;
+                        	 hall_cal.hall_cal_state = 2; // success
                              // zero
                              hall_cal.hall_cal_count = 0 ;
-                             state.state = MOTOR_MODE;
+                    		 fsmstate->next_state = MOTOR_MODE ;
                          }
                      }
                      else{
-                     	// calibrate_offset != 0
+                    	 // calibrate_offset != 0
                          if(controller.theta_mech >= hall_cal.hall_mid_pos - HALL_CAL_OFFSET*PI_F/180)  hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd + HALL_CAL_DIR*1.0f/40000.0f*HALL_CAL_SPEED ;
                          else{
-                         	// stop
-                         	hall_cal.hall_cal_pcmd = 0.0f;
-                         	hall_cal.hall_cal_state = 2; // success
+                        	 // stop
+                        	 hall_cal.hall_cal_pcmd = 0.0f;
+                        	 hall_cal.hall_cal_state = 2; // success
                              // zero
                              hall_cal.hall_cal_count = 0 ;
-                             state.state = MOTOR_MODE;
+                    		 fsmstate->next_state = MOTOR_MODE ;
                          }
                      }
                  }
