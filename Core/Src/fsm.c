@@ -182,6 +182,7 @@
 			case HALL_CALIBRATE:
 				printf("Exiting Hall Calibration Mode\r\n");
 				GPIO_DISABLE;
+				LED_LOW;
 				drv_disable_gd(drv);
 				fsmstate->ready = 1;
 				break;
