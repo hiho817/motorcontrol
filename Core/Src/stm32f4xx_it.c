@@ -224,6 +224,7 @@ void CAN1_RX0_IRQHandler(void)
   /* USER CODE BEGIN CAN1_RX0_IRQn 1 */
 
   HAL_CAN_GetRxMessage(&CAN_H, CAN_RX_FIFO0, &can_rx.rx_header, can_rx.data);	// Read CAN
+  state.print_uart_msg = 0;
   uint32_t TxMailbox;
   pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
   HAL_CAN_AddTxMessage(&CAN_H, &can_tx.tx_header, can_tx.data, &TxMailbox);	// Send response
@@ -295,6 +296,7 @@ void USART2_IRQHandler(void)
 {
   /* USER CODE BEGIN USART2_IRQn 0 */
 	HAL_UART_IRQHandler(&huart2);
+	state.print_uart_msg = 1;
 
 	char c = Serial2RxBuffer[0];
 	update_fsm(&state, c);
@@ -311,6 +313,7 @@ void can_tx_rx(void){
 
 	int no_mesage = HAL_CAN_GetRxMessage(&CAN_H, CAN_RX_FIFO0, &can_rx.rx_header, can_rx.data);	// Read CAN
 	if(!no_mesage){
+		state.print_uart_msg = 0;
 		uint32_t TxMailbox;
 		pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
 		HAL_CAN_AddTxMessage(&CAN_H, &can_tx.tx_header, can_tx.data, &TxMailbox);	// Send response

@@ -185,11 +185,13 @@ int main(void)
   if(isnan(PPAIRS) || PPAIRS==-1)                  {PPAIRS = 21.0f;}
 
 //  printf("\r\nFirmware Version Number: %.2f\r\n", VERSION_NUM);
-  printf("\nFirmware Version:  %s\n", FIRMWARE_VERSION);
-  printf("\nBuild Date:  %s\n", FIRMWARE_DATE);
-  printf("Build Time:  %s\n", FIRMWARE_TIME);
-  printf("\nAuthor:  %s\n", AUTHOR_NAME);
-  printf("\nModification Info:  %s\n", MODIFICATION_INFO);
+  printf("\r\n= = = = = Version Information = = = = =\r\n");
+  printf("\r\nFirmware Version:  %s\r\n", FIRMWARE_VERSION);
+  printf("\r\nBuild Date:  %s\r\n", FIRMWARE_DATE);
+  printf("Build Time:  %s\r\n", FIRMWARE_TIME);
+  printf("\r\nAuthor:  %s\r\n", AUTHOR_NAME);
+  printf("\r\nModification Info:  %s\r\n", MODIFICATION_INFO);
+  printf("\r\n= = = = = Program Started = = = = =\r\n");
 
   /* Controller Setup */
   if(PHASE_ORDER){							// Timer channel to phase mapping
@@ -268,6 +270,8 @@ int main(void)
   state.state = MENU_MODE;
   state.next_state = MENU_MODE;
   state.ready = 1;
+  state.print_uart_msg = 1;
+  enter_menu_state();
 
 
   /* Turn on interrupts */

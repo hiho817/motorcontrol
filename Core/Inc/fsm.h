@@ -40,6 +40,7 @@ typedef struct{
 	uint8_t next_state;
 	uint8_t state_change;
 	uint8_t ready;
+	uint8_t print_uart_msg;
 	char cmd_buff[8];
 	char bytecount;
 	char cmd_id;
