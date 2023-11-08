@@ -174,7 +174,7 @@ int main(void)
   if(isnan(I_FW_MAX) || I_FW_MAX ==-1)             {I_FW_MAX = 0.0f;}
   if(isnan(I_MAX_CONT) || I_MAX_CONT==-1)          {I_MAX_CONT = 14.0f;}
   if(isnan(I_CAL) || I_CAL==-1)                    {I_CAL = 5.0f;}
-  if(HALL_CAL_DIR==-1)                             {HALL_CAL_DIR = 1;}
+  if(HALL_CAL_DIR != 1 && HALL_CAL_DIR != -1)      {HALL_CAL_DIR = 1;}
   if(isnan(HALL_CAL_OFFSET) || HALL_CAL_OFFSET==-1){HALL_CAL_OFFSET = 0.0f;}
   if(isnan(HALL_CAL_SPEED) || HALL_CAL_SPEED==-1)  {HALL_CAL_SPEED = 0.25f;}
   if(CAN_ID==-1)                                   {CAN_ID = 1;}
