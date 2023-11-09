@@ -104,21 +104,31 @@
 
 		switch(fsmstate->state){
 			case MENU_MODE:
-				printf("\r\nEntering Main Menu\r\n");
+				if (fsmstate->print_uart_msg){
+					printf("\r\nEntering Main Menu\r\n");
+				}
 				break;
 			case SETUP_MODE:
-				printf("\r\nEntering Setup\r\n");
+				if (fsmstate->print_uart_msg){
+					printf("\r\nEntering Setup\r\n");
+				}
 				enter_setup_state();
 				break;
 			case ENCODER_MODE:
-				printf("\r\nEntering Encoder Mode\r\n");
+				if (fsmstate->print_uart_msg){
+					printf("\r\nEntering Encoder Mode\r\n");
+				}
 				break;
 			case MOTOR_MODE:
-				printf("\r\nEntering Motor Mode\r\n");
+				if (fsmstate->print_uart_msg){
+					printf("\r\nEntering Motor Mode\r\n");
+				}
 				enter_motor_mode();
 				break;
 			case ENCODER_CALIBRATE:
-				printf("\r\nEntering Encoder Calibration Mode\r\n");
+				if (fsmstate->print_uart_msg){
+					printf("\r\nEntering Encoder Calibration Mode\r\n");
+				}
 				/* zero out all calibrations before starting */
 
 				comm_encoder_cal.done_cal = 0;
@@ -130,7 +140,9 @@
 				GPIO_ENABLE;
 				break;
 			case HALL_CALIBRATE:
-				printf("\r\nEntering Hall Calibration Mode\r\n");
+				if (fsmstate->print_uart_msg){
+					printf("\r\nEntering Hall Calibration Mode\r\n");
+				}
 				controller.kp = 5.0f ;
 				controller.ki = 0.0f ;
 				controller.kd = 1.0f ;
@@ -146,21 +158,29 @@
 
 		switch(fsmstate->state){
 			case MENU_MODE:
-				printf("\r\nLeaving Main Menu\r\n");
+				if (fsmstate->print_uart_msg){
+					printf("\r\nLeaving Main Menu\r\n");
+				}
 				fsmstate->ready = 1;
 				break;
 			case SETUP_MODE:
-				printf("\r\nLeaving Setup Menu\r\n");
+				if (fsmstate->print_uart_msg){
+					printf("\r\nLeaving Setup Menu\r\n");
+				}
 				fsmstate->ready = 1;
 				break;
 			case ENCODER_MODE:
-				printf("\r\nLeaving Encoder Mode\r\n");
+				if (fsmstate->print_uart_msg){
+					printf("\r\nLeaving Encoder Mode\r\n");
+				}
 				fsmstate->ready = 1;
 				break;
 			case MOTOR_MODE:
 				/* Don't stop commutating if there are high currents or FW happening */
 				//if( (fabs(controller.i_q_filt)<1.0f) && (fabs(controller.i_d_filt)<1.0f) ){
-				printf("\r\nLeaving Motor Mode\r\n");
+				if (fsmstate->print_uart_msg){
+					printf("\r\nLeaving Motor Mode\r\n");
+				}
 				fsmstate->ready = 1;
 				drv_disable_gd(drv);
 				reset_foc(&controller);
@@ -170,7 +190,9 @@
 				zero_commands(&controller);		// Set commands to zero
 				break;
 			case ENCODER_CALIBRATE:
-				printf("\r\nExiting Encoder Calibration Mode\r\n");
+				if (fsmstate->print_uart_msg){
+					printf("\r\nExiting Encoder Calibration Mode\r\n");
+				}
 				GPIO_DISABLE;
 				drv_disable_gd(drv);
 				//free(error_array);
@@ -179,7 +201,9 @@
 				fsmstate->ready = 1;
 				break;
 			case HALL_CALIBRATE:
-				printf("\r\nExiting Hall Calibration Mode\r\n");
+				if (fsmstate->print_uart_msg){
+					printf("\r\nExiting Hall Calibration Mode\r\n");
+				}
 				GPIO_DISABLE;
 				LED_LOW;
 				drv_disable_gd(drv);
@@ -196,7 +220,7 @@
 	if(fsm_input == MENU_CMD){	// escape to exit to rest mode
 		fsmstate->next_state = MENU_MODE;
 		fsmstate->ready = 0;
-		if (fsmstate->print_uart_msg == 1){
+		if (fsmstate->print_uart_msg){
 			enter_menu_state();
 		}
 		return;
