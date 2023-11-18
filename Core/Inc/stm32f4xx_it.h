@@ -59,7 +59,6 @@ void TIM1_UP_TIM10_IRQHandler(void);
 void USART2_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 void can_tx_rx(void);
-void hall_calibrate(void);
 /* USER CODE END EFP */
 
 #ifdef __cplusplus

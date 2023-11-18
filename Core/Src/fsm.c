@@ -413,7 +413,7 @@
 //			 printf("TEMP_MAX set to %f\r\n", TEMP_MAX);
 //			 break;
 		 default:
-			 printf("\n\r '%c' Not a valid command prefix\n\r\n\r", fsmstate->cmd_buff);
+			 printf("\n\r '%s' Not a valid command prefix\n\r\n\r", fsmstate->cmd_buff);
 			 break;
 
 		 }

@@ -54,6 +54,7 @@ void enter_menu_state(void);
 void enter_setup_state(void);
 void enter_motor_mode(void);
 void process_user_input(FSMStruct * fsmstate);
+void hall_calibrate(FSMStruct * fsmstate);
 
 #ifdef __cplusplus
 }
