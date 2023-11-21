@@ -11619,7 +11619,7 @@ void can_tx_rx(void){
  80062dc:	0800650f 	.word	0x0800650f
  80062e0:	080065b1 	.word	0x080065b1
 			{
-				case 0:  // REST Mode
+				case 0:  // REST Mode -> make motor back to the initial state
 					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
  80062e4:	4baa      	ldr	r3, [pc, #680]	; (8006590 <can_tx_rx+0x2fc>)
  80062e6:	ed93 7a03 	vldr	s14, [r3, #12]
@@ -11660,7 +11660,7 @@ void can_tx_rx(void){
  800634c:	f7fd fbe0 	bl	8003b10 <update_fsm>
 					break;
  8006350:	e1aa      	b.n	80066a8 <can_tx_rx+0x414>
-				case 1:  // READ_INFO Mode
+				case 1:  // READ_INFO Mode -> only read information and do nothing
 					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
  8006352:	4b8f      	ldr	r3, [pc, #572]	; (8006590 <can_tx_rx+0x2fc>)
  8006354:	ed93 7a03 	vldr	s14, [r3, #12]
@@ -11697,7 +11697,7 @@ void can_tx_rx(void){
  80063b2:	f7fb fc7b 	bl	8001cac <pack_reply>
 					break;
  80063b6:	e177      	b.n	80066a8 <can_tx_rx+0x414>
-				case 2:  // SET_ZERO Mode
+				case 2:  // SET_ZERO Mode -> set the current position as zero pos
 					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
  80063b8:	4b75      	ldr	r3, [pc, #468]	; (8006590 <can_tx_rx+0x2fc>)
  80063ba:	ed93 7a03 	vldr	s14, [r3, #12]
@@ -11738,7 +11738,7 @@ void can_tx_rx(void){
  8006420:	f7fd fb76 	bl	8003b10 <update_fsm>
 					break;
  8006424:	e140      	b.n	80066a8 <can_tx_rx+0x414>
-				case 3:  // HALL_CAL Mode
+				case 3:  // HALL_CAL Mode -> enter hall calibration mode
 					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
  8006426:	4b5a      	ldr	r3, [pc, #360]	; (8006590 <can_tx_rx+0x2fc>)
  8006428:	ed93 7a03 	vldr	s14, [r3, #12]
@@ -11830,7 +11830,7 @@ void can_tx_rx(void){
  8006508:	f7fd fb02 	bl	8003b10 <update_fsm>
 					break;
  800650c:	e0cc      	b.n	80066a8 <can_tx_rx+0x414>
-				case 4:  // Only enter MOTOR Mode
+				case 4:  // MOTOR Mode -> Only enter motor mode without changing the controller commands
 					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
  800650e:	4b20      	ldr	r3, [pc, #128]	; (8006590 <can_tx_rx+0x2fc>)
  8006510:	ed93 7a03 	vldr	s14, [r3, #12]
@@ -11884,7 +11884,7 @@ void can_tx_rx(void){
  80065a4:	40c90fdb 	.word	0x40c90fdb
  80065a8:	2000024c 	.word	0x2000024c
  80065ac:	40490fdb 	.word	0x40490fdb
-				case 5:  // Enter Motor Mode and send controller commands
+				case 5:  // MOTOR_UPDATE Mode -> send controller commands (useless before entering the motor mode)
 					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
  80065b0:	4b42      	ldr	r3, [pc, #264]	; (80066bc <can_tx_rx+0x428>)
  80065b2:	ed93 7a03 	vldr	s14, [r3, #12]

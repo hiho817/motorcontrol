@@ -288,18 +288,18 @@ void can_tx_rx(void){
 		/* Check for special commands by function code*/
 		switch (can_rx.rx_header.StdId >> 7)
 			{
-				case 0:  // REST Mode
+				case 0:  // REST Mode -> make motor back to the initial state
 					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
 					update_fsm(&state, MENU_CMD);
 					break;
-				case 1:  // READ_INFO Mode
+				case 1:  // READ_INFO Mode -> only read information and do nothing
 					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
 					break;
-				case 2:  // SET_ZERO Mode
+				case 2:  // SET_ZERO Mode -> set the current position as zero pos
 					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
 					update_fsm(&state, ZERO_CMD);
 					break;
-				case 3:  // HALL_CAL Mode
+				case 3:  // HALL_CAL Mode -> enter hall calibration mode
 					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
 					hall_cal.hall_cal_count = 0;
 					hall_cal.hall_cal_state = 1; // calibrating
@@ -312,11 +312,11 @@ void can_tx_rx(void){
 					if(hall_cal.hall_cal_pcmd < 0) hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd + 2*PI_F;
 					update_fsm(&state, HALL_CAL_CMD);
 					break;
-				case 4:  // Only enter MOTOR Mode
+				case 4:  // MOTOR Mode -> Only enter motor mode without changing the controller commands
 					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
 					update_fsm(&state, MOTOR_CMD);
 					break;
-				case 5:  // Enter Motor Mode and send controller commands
+				case 5:  // MOTOR_UPDATE Mode -> send controller commands (useless before entering the motor mode)
 					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
 					unpack_cmd(can_rx, controller.commands);	// Unpack commands
 					controller.timeout = 0;					    // Reset timeout counter
