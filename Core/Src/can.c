@@ -123,12 +123,12 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
 
 void can_rx_init(CANRxMessage *msg){
 	msg->filter.FilterFIFOAssignment=CAN_FILTER_FIFO0; 	// set fifo assignment
-	msg->filter.FilterIdHigh=CAN_ID<<5; 				// CAN ID
+	msg->filter.FilterIdHigh=CAN_ID<<5;         // CAN ID
 	msg->filter.FilterIdLow=0x0;
 	msg->filter.FilterMaskIdHigh=0xFFF;
-	msg->filter.FilterMaskIdLow=0;
+	msg->filter.FilterMaskIdLow=0xFFFF;
 	msg->filter.FilterMode = CAN_FILTERMODE_IDMASK;
-	msg->filter.FilterScale=CAN_FILTERSCALE_32BIT;
+	msg->filter.FilterScale=CAN_FILTERSCALE_16BIT;
 	msg->filter.FilterActivation=ENABLE;
 	HAL_CAN_ConfigFilter(&CAN_H, &msg->filter);
 }

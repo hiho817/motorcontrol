@@ -226,35 +226,49 @@ void CAN1_RX0_IRQHandler(void)
   HAL_CAN_GetRxMessage(&CAN_H, CAN_RX_FIFO0, &can_rx.rx_header, can_rx.data);	// Read CAN
   state.print_uart_msg = 0;
   uint32_t TxMailbox;
-  pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
-  HAL_CAN_AddTxMessage(&CAN_H, &can_tx.tx_header, can_tx.data, &TxMailbox);	// Send response
 
-  /* Check for special Commands */
-  if(((can_rx.data[0]==0xFF) & (can_rx.data[1]==0xFF) & (can_rx.data[2]==0xFF) & (can_rx.data[3]==0xFF) & (can_rx.data[4]==0xFF) & (can_rx.data[5]==0xFF) & (can_rx.data[6]==0xFF) & (can_rx.data[7]==0xFC))){
-	  update_fsm(&state, MOTOR_CMD);
-      }
-  else if(((can_rx.data[0]==0xFF) & (can_rx.data[1]==0xFF) & (can_rx.data[2]==0xFF) & (can_rx.data[3]==0xFF) * (can_rx.data[4]==0xFF) & (can_rx.data[5]==0xFF) & (can_rx.data[6]==0xFF) & (can_rx.data[7]==0xFD))){
-      update_fsm(&state, MENU_CMD);
-      }
-  else if(((can_rx.data[0]==0xFF) & (can_rx.data[1]==0xFF) & (can_rx.data[2]==0xFF) & (can_rx.data[3]==0xFF) * (can_rx.data[4]==0xFF) & (can_rx.data[5]==0xFF) & (can_rx.data[6]==0xFF) & (can_rx.data[7]==0xFE))){
-	  update_fsm(&state, ZERO_CMD);
-      }
-  else if(((can_rx.data[0]==0xFF) & (can_rx.data[1]==0xFF) & (can_rx.data[2]==0xFF) & (can_rx.data[3]==0xFF) * (can_rx.data[4]==0xFF) & (can_rx.data[5]==0xFF) & (can_rx.data[6]==0xFF) & (can_rx.data[7]==0xFA))){
-      hall_cal.hall_cal_count = 0;
-      hall_cal.hall_cal_state = 1; // calibrating
-      /*----- convert theta_mech to 0~359.9999deg -----*/
-      hall_cal.hall_present_pos = controller.theta_mech;
-      hall_cal.hall_cal_pcmd = controller.theta_mech;
-      static float _f_cal_round;
-      modff(hall_cal.hall_cal_pcmd/(2*PI_F),&_f_cal_round);
-      hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd - _f_cal_round*2*PI_F;
-      if(hall_cal.hall_cal_pcmd < 0) hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd + 2*PI_F;
-      update_fsm(&state, HALL_CAL_CMD);
-  	  }
-  else{
-	  unpack_cmd(can_rx, controller.commands);	// Unpack commands
-	  controller.timeout = 0;					// Reset timeout counter
-  }
+	/* Check for special commands by function code*/
+	switch (can_rx.rx_header.StdId >> 7)
+		{
+			case 0:  // REST Mode
+				pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
+				update_fsm(&state, MENU_CMD);
+				break;
+			case 1:  // READ_INFO Mode
+				pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
+				break;
+			case 2:  // SET_ZERO Mode
+				pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
+				update_fsm(&state, ZERO_CMD);
+				break;
+			case 3:  // HALL_CAL Mode
+				pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
+				hall_cal.hall_cal_count = 0;
+				hall_cal.hall_cal_state = 1; // calibrating
+				/*----- convert theta_mech to 0~359.9999deg -----*/
+				hall_cal.hall_present_pos = controller.theta_mech;
+				hall_cal.hall_cal_pcmd = controller.theta_mech;
+				static float _f_cal_round;
+				modff(hall_cal.hall_cal_pcmd/(2*PI_F),&_f_cal_round);
+				hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd - _f_cal_round*2*PI_F;
+				if(hall_cal.hall_cal_pcmd < 0) hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd + 2*PI_F;
+				update_fsm(&state, HALL_CAL_CMD);
+				break;
+			case 4:  // Only enter MOTOR Mode
+				pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
+				update_fsm(&state, MOTOR_CMD);
+				break;
+			case 5:  // Enter Motor Mode and send controller commands
+				pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
+				unpack_cmd(can_rx, controller.commands);	// Unpack commands
+				controller.timeout = 0;					    // Reset timeout counter
+				controller.i_mag_max = controller.i_q;
+				break;
+			default:
+				pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
+				break;
+		}
+	HAL_CAN_AddTxMessage(&CAN_H, &can_tx.tx_header, can_tx.data, &TxMailbox);	// Send response
 
   /* USER CODE END CAN1_RX0_IRQn 1 */
 }
@@ -315,36 +329,49 @@ void can_tx_rx(void){
 	if(!no_mesage){
 		state.print_uart_msg = 0;
 		uint32_t TxMailbox;
-		pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
-		HAL_CAN_AddTxMessage(&CAN_H, &can_tx.tx_header, can_tx.data, &TxMailbox);	// Send response
 
-		/* Check for special Commands */
-		if (can_rx.ll_data == 0xFCFFFFFFFFFFFFFF){
-			update_fsm(&state, MOTOR_CMD);
-		}
-		else if(can_rx.ll_data == 0xFDFFFFFFFFFFFFFF){
-			update_fsm(&state, MENU_CMD);
+		/* Check for special commands by function code*/
+		switch (can_rx.rx_header.StdId >> 7)
+			{
+				case 0:  // REST Mode
+					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
+					update_fsm(&state, MENU_CMD);
+					break;
+				case 1:  // READ_INFO Mode
+					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
+					break;
+				case 2:  // SET_ZERO Mode
+					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
+					update_fsm(&state, ZERO_CMD);
+					break;
+				case 3:  // HALL_CAL Mode
+					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
+					hall_cal.hall_cal_count = 0;
+					hall_cal.hall_cal_state = 1; // calibrating
+					/*----- convert theta_mech to 0~359.9999deg -----*/
+					hall_cal.hall_present_pos = controller.theta_mech;
+					hall_cal.hall_cal_pcmd = controller.theta_mech;
+					static float _f_cal_round;
+					modff(hall_cal.hall_cal_pcmd/(2*PI_F),&_f_cal_round);
+					hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd - _f_cal_round*2*PI_F;
+					if(hall_cal.hall_cal_pcmd < 0) hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd + 2*PI_F;
+					update_fsm(&state, HALL_CAL_CMD);
+					break;
+				case 4:  // Only enter MOTOR Mode
+					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
+					update_fsm(&state, MOTOR_CMD);
+					break;
+				case 5:  // Enter Motor Mode and send controller commands
+					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
+					unpack_cmd(can_rx, controller.commands);	// Unpack commands
+					controller.timeout = 0;					    // Reset timeout counter
+					controller.i_mag_max = controller.i_q;
+					break;
+				default:
+					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
+					break;
 			}
-		else if(can_rx.ll_data == 0xFEFFFFFFFFFFFFFF){
-			  update_fsm(&state, ZERO_CMD);
-			}
-		else if(can_rx.ll_data == 0xFAFFFFFFFFFFFFFF){
-		      hall_cal.hall_cal_count = 0;
-		      hall_cal.hall_cal_state = 1; // calibrating
-		      /*----- convert theta_mech to 0~359.9999deg -----*/
-		      hall_cal.hall_present_pos = controller.theta_mech;
-		      hall_cal.hall_cal_pcmd = controller.theta_mech;
-		      static float _f_cal_round;
-		      modff(hall_cal.hall_cal_pcmd/(2*PI_F),&_f_cal_round);
-		      hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd - _f_cal_round*2*PI_F;
-		      if(hall_cal.hall_cal_pcmd < 0) hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd + 2*PI_F;
-		      update_fsm(&state, HALL_CAL_CMD);
-		  	  }
-		else{
-			  unpack_cmd(can_rx, controller.commands);	// Unpack commands
-			  controller.timeout = 0;					// Reset timeout counter
-		controller.i_mag_max = controller.i_q;
-		}
+		HAL_CAN_AddTxMessage(&CAN_H, &can_tx.tx_header, can_tx.data, &TxMailbox);	// Send response
 	}
 
 }
