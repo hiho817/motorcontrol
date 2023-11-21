@@ -134,7 +134,7 @@ void can_rx_init(CANRxMessage *msg){
 }
 
 void can_tx_init(CANTxMessage *msg){
-	msg->tx_header.DLC = 7; 			// message size of 7 byte
+	msg->tx_header.DLC = 8; 			// message size of 8 byte
 	msg->tx_header.IDE=CAN_ID_STD; 		// set identifier to standard
 	msg->tx_header.RTR=CAN_RTR_DATA; 	// set data type to remote transmission request?
 	msg->tx_header.StdId = CAN_MASTER;  // recipient CAN ID
