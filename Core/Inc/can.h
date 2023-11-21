@@ -59,7 +59,10 @@ void MX_CAN1_Init(void);
 /* USER CODE BEGIN Prototypes */
 typedef struct{
 	uint8_t id;
-	uint8_t data[8];
+	union{
+		uint8_t data[8];
+		long long ll_data;
+	};
 	CAN_RxHeaderTypeDef rx_header;
 	CAN_FilterTypeDef filter;
 }CANRxMessage ;

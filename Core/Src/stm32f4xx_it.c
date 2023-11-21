@@ -319,16 +319,16 @@ void can_tx_rx(void){
 		HAL_CAN_AddTxMessage(&CAN_H, &can_tx.tx_header, can_tx.data, &TxMailbox);	// Send response
 
 		/* Check for special Commands */
-		if(((can_rx.data[0]==0xFF) & (can_rx.data[1]==0xFF) & (can_rx.data[2]==0xFF) & (can_rx.data[3]==0xFF) & (can_rx.data[4]==0xFF) & (can_rx.data[5]==0xFF) & (can_rx.data[6]==0xFF) & (can_rx.data[7]==0xFC))){
-			  update_fsm(&state, MOTOR_CMD);
-			}
-		else if(((can_rx.data[0]==0xFF) & (can_rx.data[1]==0xFF) & (can_rx.data[2]==0xFF) & (can_rx.data[3]==0xFF) * (can_rx.data[4]==0xFF) & (can_rx.data[5]==0xFF) & (can_rx.data[6]==0xFF) & (can_rx.data[7]==0xFD))){
+		if (can_rx.ll_data == 0xFCFFFFFFFFFFFFFF){
+			update_fsm(&state, MOTOR_CMD);
+		}
+		else if(can_rx.ll_data == 0xFDFFFFFFFFFFFFFF){
 			update_fsm(&state, MENU_CMD);
 			}
-		else if(((can_rx.data[0]==0xFF) & (can_rx.data[1]==0xFF) & (can_rx.data[2]==0xFF) & (can_rx.data[3]==0xFF) * (can_rx.data[4]==0xFF) & (can_rx.data[5]==0xFF) & (can_rx.data[6]==0xFF) & (can_rx.data[7]==0xFE))){
+		else if(can_rx.ll_data == 0xFEFFFFFFFFFFFFFF){
 			  update_fsm(&state, ZERO_CMD);
 			}
-		else if(((can_rx.data[0]==0xFF) & (can_rx.data[1]==0xFF) & (can_rx.data[2]==0xFF) & (can_rx.data[3]==0xFF) * (can_rx.data[4]==0xFF) & (can_rx.data[5]==0xFF) & (can_rx.data[6]==0xFF) & (can_rx.data[7]==0xFA))){
+		else if(can_rx.ll_data == 0xFAFFFFFFFFFFFFFF){
 		      hall_cal.hall_cal_count = 0;
 		      hall_cal.hall_cal_state = 1; // calibrating
 		      /*----- convert theta_mech to 0~359.9999deg -----*/
