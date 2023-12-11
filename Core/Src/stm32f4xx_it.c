@@ -326,6 +326,7 @@ void can_tx_rx(void){
 					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
 					break;
 			}
+		can_tx.tx_header.StdId = can_rx.rx_header.StdId | 0x400;
 		HAL_CAN_AddTxMessage(&CAN_H, &can_tx.tx_header, can_tx.data, &TxMailbox);	// Send response
 	}
 
