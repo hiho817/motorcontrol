@@ -321,7 +321,7 @@
 	    printf(" %-4s %-31s %-5s %-6s %.3f\n\r", "a", "Calibration Current (A)",                   "0.0", "20.0",   I_CAL);
 		printf(" %-4s %-31s %-5s %-6s %d\n\r",   "r", "Hall Calibration Direction",                "-1",  "1",      HALL_CAL_DIR);
 		printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "e", "Hall Calibration offset",                   "0.0", "143.0",  HALL_CAL_OFFSET);
-		printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "s", "Hall Calibration Speed",                    "0.0", "10.0",   HALL_CAL_SPEED);
+		printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "h", "Hall Calibration Speed",                    "0.0", "10.0",   HALL_CAL_SPEED);
 	    printf("\r\n CAN:\r\n");
 	    printf(" %-4s %-31s %-5s %-6s %-5i\n\r", "n", "CAN ID",                                    "0",   "127",    CAN_ID);
 	    printf(" %-4s %-31s %-5s %-6s %-5i\n\r", "m", "CAN TX ID",                                 "0",   "127",    CAN_MASTER);
@@ -333,6 +333,14 @@
  void process_user_input(FSMStruct * fsmstate){
 	 /* Collects user input from serial (maybe eventually CAN) and updates settings */
 
+	 static char* response;  // Static buffer for the response
+	 response = float_reg_update_uart(fsmstate->cmd_id, fsmstate->cmd_buff);
+	 if (strcmp(response, STR_INVALID_CMD) == 0){
+		 response = int_reg_update_uart(fsmstate->cmd_id, fsmstate->cmd_buff);
+	 }
+	 printf(response);
+
+	 /*
 	 switch (fsmstate->cmd_id){
 		 case 'g':
 			 GR = fmaxf(atof(fsmstate->cmd_buff), .001f);	// Limit prevents divide by zero if user tries to enter zero
@@ -417,6 +425,7 @@
 			 break;
 
 		 }
+	*/
 
 	 /* Write new settings to flash */
 

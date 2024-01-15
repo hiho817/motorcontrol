@@ -24,6 +24,7 @@
 #include "hw_config.h"
 #include "user_config.h"
 #include "math_ops.h"
+#include <string.h>
 /* USER CODE END 0 */
 
 CAN_HandleTypeDef hcan1;
@@ -151,20 +152,78 @@ void can_tx_init(CANTxMessage *msg){
 /// 2: [velocity[11-4]]
 /// 3: [velocity[3-0], current[11-8]]
 /// 4: [current[7-0]]
-void pack_reply(CANTxMessage *msg, float p, float v, float t, int version, int calibrate_finish, int state, float iq_ref){
+void pack_reply_default(CANRxMessage rx_msg, CANTxMessage *tx_msg, float p, float v, float t, int version, int calibrate_finish, int state){
     int p_int = float_to_uint(p, P_REPLY_MIN, P_REPLY_MAX, 16);
-    int v_int = float_to_uint(v, V_MIN, V_MAX, 12);
-    int t_int = float_to_uint(t, -(I_MAX+SENSE_BUFFER)*KT*GR, (I_MAX+SENSE_BUFFER)*KT*GR, 12);
+    int v_int = float_to_uint(v, V_MIN, V_MAX, 16);
+    int t_int = float_to_uint(t, -(I_MAX+SENSE_BUFFER)*KT*GR, (I_MAX+SENSE_BUFFER)*KT*GR, 16);
 
-    msg->data[0] = CAN_ID;
-    msg->data[1] = p_int>>8;
-    msg->data[2] = p_int&0xFF;
-    msg->data[3] = v_int>>4;
-    msg->data[4] = ((v_int&0xF)<<4) + (t_int>>8);
-    msg->data[5] = t_int&0xFF;
-    msg->data[6] = (version<<4) + (calibrate_finish&0xF);
-    msg->data[7] = state;
-    }
+    tx_msg->data[0] = p_int>>8;
+    tx_msg->data[1] = p_int&0xFF;
+    tx_msg->data[2] = v_int>>8;
+    tx_msg->data[3] = v_int&0xFF;
+    tx_msg->data[4] = t_int>>8;
+    tx_msg->data[5] = t_int&0xFF;
+    tx_msg->data[6] = 0x0 + (calibrate_finish&0xF);
+    tx_msg->data[7] = (version<<4) + (state&0xF);
+}
+
+void pack_reply_config(CANRxMessage rx_msg, CANTxMessage *tx_msg, int version, int state){
+	int func_type = rx_msg.data[0];
+	int reg_type = rx_msg.data[1];
+	int target_addr = rx_msg.data[2];
+	float reg_data;
+	int config_state;
+
+	if (func_type == 0){
+		config_state = unpack_config_cmd(rx_msg);
+	}
+	else if ((reg_type == 0 && (target_addr < 0 || target_addr >= INT_REG_LENGTH)) ||
+			 (reg_type == 1 && (target_addr < 0 || target_addr >= FLOAT_REG_LENGTH))){
+		config_state = CODE_INVALID_ADDR;
+		reg_data = 0;
+	}
+	else if (reg_type != 0 && reg_type != 1){
+		config_state = CODE_INVALID_CMD;
+		reg_data = 0;
+	}
+	else{
+		config_state = CODE_CONFIG_SUCCESS;
+	}
+
+	if (reg_type == 0 && config_state != CODE_INVALID_ADDR){
+		reg_data = __int_reg[target_addr];
+	}
+	else if (reg_type == 0 && config_state != CODE_INVALID_ADDR){
+		reg_data = __float_reg[target_addr];
+	}
+
+	tx_msg->data[0] = config_state;
+	tx_msg->data[1] = reg_type;
+	tx_msg->data[2] = target_addr;
+
+	memcpy((void*)&(tx_msg->data[3]), (void*)&reg_data, sizeof(float));
+
+	tx_msg->data[7] = (version<<4) + (state&0xF);
+}
+
+void pack_reply_hall_cal(CANRxMessage rx_msg, CANTxMessage *tx_msg, int version, int state){
+	int config_state;
+
+	if (rx_msg.data[0] == 0){
+		config_state = unpack_hall_cal_cmd(rx_msg);
+	}
+	else{
+		config_state = CODE_CONFIG_SUCCESS;
+	}
+
+	tx_msg->data[0] = config_state;
+	tx_msg->data[1] = 0;
+	tx_msg->data[2] = 0;
+
+	memcpy((void*)&(tx_msg->data[3]), (void*)&__float_reg[ADDR_HALL_CAL_OFFSET], sizeof(float));
+
+	tx_msg->data[7] = (version<<4) + (state&0xF);
+}
 
 /// CAN Command Packet Structure ///
 /// 16 bit position command, between -4*pi and 4*pi
@@ -182,12 +241,12 @@ void pack_reply(CANTxMessage *msg, float p, float v, float t, int version, int c
 /// 5: [kd[11-4]]
 /// 6: [kd[3-0], torque[11-8]]
 /// 7: [torque[7-0]]
-void unpack_cmd(CANRxMessage msg, float *commands){// ControllerStruct * controller){
-        int p_int = (msg.data[0]<<8)|msg.data[1];
-        int kp_int = (msg.data[2]<<4)|(msg.data[3]>>4);
-        int ki_int = ((msg.data[3]&0xF)<<8)|msg.data[4];
-        int kd_int = (msg.data[5]<<4)|(msg.data[6]>>4);
-        int t_int = ((msg.data[6]&0xF)<<8)|msg.data[7];
+void unpack_control_cmd(CANRxMessage rx_msg, float *commands){// ControllerStruct * controller){
+        int p_int = (rx_msg.data[0]<<8)|rx_msg.data[1];
+        int kp_int = (rx_msg.data[2]<<4)|(rx_msg.data[3]>>4);
+        int ki_int = ((rx_msg.data[3]&0xF)<<8)|rx_msg.data[4];
+        int kd_int = (rx_msg.data[5]<<4)|(rx_msg.data[6]>>4);
+        int t_int = ((rx_msg.data[6]&0xF)<<8)|rx_msg.data[7];
 
         commands[0] = uint_to_float(p_int, P_MIN, P_MAX, 16);
         commands[1] = uint_to_float(kp_int, KP_MIN, KP_MAX, 12);
@@ -197,7 +256,39 @@ void unpack_cmd(CANRxMessage msg, float *commands){// ControllerStruct * control
     //printf("Received   ");
     //printf("%.3f  %.3f  %.3f  %.3f  %.3f   %.3f", controller->p_des, controller->v_des, controller->kp, controller->kd, controller->t_ff, controller->i_q_ref);
     //printf("\n\r");
-    }
+}
+
+int unpack_config_cmd(CANRxMessage rx_msg){
+	int reg_type = rx_msg.data[1];
+	int target_addr = rx_msg.data[2];
+	float new_data = 0;
+	int config_state;
+
+	memcpy((void*)&new_data, (void*)&(rx_msg.data[3]), sizeof(float));
+
+	if (reg_type == 0){
+		config_state = int_reg_update_can(target_addr, new_data);
+	}
+	else if (reg_type == 1){
+		config_state = float_reg_update_can(target_addr, new_data);
+	}
+	else{
+		config_state = CODE_INVALID_CMD;
+	}
+
+	return config_state;
+}
+
+int unpack_hall_cal_cmd(CANRxMessage rx_msg){
+	float new_data = 0;
+	int config_state;
+
+	memcpy((void*)&new_data, (void*)&(rx_msg.data[1]), sizeof(float));
+
+	config_state = float_reg_update_can(ADDR_HALL_CAL_OFFSET, new_data);
+
+	return config_state;
+}
 
 /* USER CODE END 1 */
 

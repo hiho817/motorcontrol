@@ -52,6 +52,12 @@ extern CAN_HandleTypeDef hcan1;
 #define VB_MAX 40.0f
 #define SENSE_BUFFER 0.0f
 
+#define FC_RESET			0
+#define FC_MANAGE_CONFIG	1
+#define FC_SET_ZERO			2
+#define FC_HALL_CAL			3
+#define FC_ENTER_MOTOR		4
+#define FC_CONTROL_CMD		5
 /* USER CODE END Private defines */
 
 void MX_CAN1_Init(void);
@@ -75,8 +81,12 @@ typedef struct{
 
 void can_rx_init(CANRxMessage *msg);
 void can_tx_init(CANTxMessage *msg);
-void pack_reply(CANTxMessage *msg, float p, float v, float t, int version, int calibrate_finish, int state, float iq_ref);
-void unpack_cmd(CANRxMessage msg, float *commands);
+void pack_reply_default(CANRxMessage rx_msg, CANTxMessage *tx_msg, float p, float v, float t, int version, int calibrate_finish, int state);
+void pack_reply_config(CANRxMessage rx_msg, CANTxMessage *tx_msg, int version, int state);
+void pack_reply_hall_cal(CANRxMessage rx_msg, CANTxMessage *tx_msg, int version, int state);
+void unpack_control_cmd(CANRxMessage rx_msg, float *commands);
+int unpack_config_cmd(CANRxMessage rx_msg);
+int unpack_hall_cal_cmd(CANRxMessage rx_msg);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

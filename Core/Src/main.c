@@ -74,8 +74,8 @@
 /* USER CODE BEGIN PV */
 
 /* Flash Registers */
-float __float_reg[64];
-int __int_reg[256];
+float __float_reg[FLOAT_REG_LENGTH];
+int __int_reg[INT_REG_LENGTH];
 PreferenceWriter prefs;
 
 int count = 0;
@@ -183,6 +183,8 @@ int main(void)
   if(isnan(R_NOMINAL) || R_NOMINAL==-1)            {R_NOMINAL = 0.0f;}
   if(isnan(TEMP_MAX) || TEMP_MAX==-1)              {TEMP_MAX = 125.0f;}
   if(isnan(PPAIRS) || PPAIRS==-1)                  {PPAIRS = 21.0f;}
+
+  user_config_initialize();
 
 //  printf("\r\nFirmware Version Number: %.2f\r\n", VERSION_NUM);
   printf("\r\n= = = = = Version Information = = = = =\r\n");
