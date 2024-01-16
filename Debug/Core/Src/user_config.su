@@ -1,5 +1,5 @@
-user_config.c:15:6:user_config_initialize	4	static
-user_config.c:184:7:float_reg_update_uart	40	static
-user_config.c:203:5:float_reg_update_can	16	static
-user_config.c:219:7:int_reg_update_uart	24	static
-user_config.c:238:5:int_reg_update_can	16	static
+user_config.c:15:6:user_config_initialize	16	static
+user_config.c:198:7:float_reg_update_uart	40	static
+user_config.c:217:5:float_reg_update_can	16	static
+user_config.c:233:7:int_reg_update_uart	24	static
+user_config.c:252:5:int_reg_update_can	16	static

@@ -13,6 +13,20 @@ struct FloatRegConfig float_reg_config[FLOAT_REG_LENGTH];
 struct IntRegConfig int_reg_config[INT_REG_LENGTH];
 
 void user_config_initialize(void){
+	for (int i=0; i<FLOAT_REG_LENGTH; i++){
+		float_reg_config[i].name = "";
+		float_reg_config[i].cmd = ' ';
+		float_reg_config[i].f_MIN = 0;
+		float_reg_config[i].f_MAX = 0;
+	}
+
+	for (int i=0; i<INT_REG_LENGTH; i++){
+		int_reg_config[i].name = "";
+		int_reg_config[i].cmd = ' ';
+		int_reg_config[i].i_MIN = 0;
+		int_reg_config[i].i_MAX = 0;
+	}
+
 	// initialize the float_reg_config array
 	float_reg_config[ADDR_I_BW].name				= NAME_I_BW;
 	float_reg_config[ADDR_I_BW].cmd					= CMD_I_BW;

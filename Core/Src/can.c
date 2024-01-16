@@ -193,7 +193,7 @@ void pack_reply_config(CANRxMessage rx_msg, CANTxMessage *tx_msg, int version, i
 	if (reg_type == 0 && config_state != CODE_INVALID_ADDR){
 		reg_data = __int_reg[target_addr];
 	}
-	else if (reg_type == 0 && config_state != CODE_INVALID_ADDR){
+	else if (reg_type == 1 && config_state != CODE_INVALID_ADDR){
 		reg_data = __float_reg[target_addr];
 	}
 
