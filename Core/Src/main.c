@@ -74,8 +74,8 @@
 /* USER CODE BEGIN PV */
 
 /* Flash Registers */
-float __float_reg[64];
-int __int_reg[256];
+float __float_reg[FLOAT_REG_LENGTH];
+int __int_reg[INT_REG_LENGTH];
 PreferenceWriter prefs;
 
 int count = 0;
@@ -184,6 +184,8 @@ int main(void)
   if(isnan(TEMP_MAX) || TEMP_MAX==-1)              {TEMP_MAX = 125.0f;}
   if(isnan(PPAIRS) || PPAIRS==-1)                  {PPAIRS = 21.0f;}
 
+  user_config_initialize();
+
 //  printf("\r\nFirmware Version Number: %.2f\r\n", VERSION_NUM);
   printf("\r\n= = = = = Version Information = = = = =\r\n");
   printf("\r\nFirmware Version:  %s\r\n", FIRMWARE_VERSION);
@@ -217,7 +219,7 @@ int main(void)
   hall_cal.hall_mid_pos = 0;
   hall_cal. hall_cal_offset = 0; // rad
   hall_cal.hall_cal_count = 0;
-  hall_cal.hall_cal_state = 0;
+  hall_cal.hall_cal_state = CODE_HALL_UNCALIBRATED;
 
   /* commutation encoder setup */
   comm_encoder.m_zero = M_ZERO;

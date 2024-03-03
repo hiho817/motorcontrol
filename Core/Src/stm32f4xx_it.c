@@ -288,21 +288,28 @@ void can_tx_rx(void){
 		/* Check for special commands by function code*/
 		switch (can_rx.rx_header.StdId >> 7)
 			{
-				case 0:  // REST Mode -> make motor back to the initial state
-					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
+				case FC_RESET:
 					update_fsm(&state, MENU_CMD);
+					pack_reply_default(can_rx, &can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state);	// Pack response
 					break;
-				case 1:  // READ_INFO Mode -> only read information and do nothing
-					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
+
+				case FC_MANAGE_CONFIG:
+					if (can_rx.data[0] <= 1){
+						pack_reply_config(can_rx, &can_tx, VERSION_NUM, state.state);
+					}
+					else{
+						pack_reply_default(can_rx, &can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state);
+					}
 					break;
-				case 2:  // SET_ZERO Mode -> set the current position as zero pos
-					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
+
+				case FC_SET_ZERO:
 					update_fsm(&state, ZERO_CMD);
+					pack_reply_default(can_rx, &can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state);
 					break;
-				case 3:  // HALL_CAL Mode -> enter hall calibration mode
-					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
+
+				case FC_HALL_CAL:
 					hall_cal.hall_cal_count = 0;
-					hall_cal.hall_cal_state = 1; // calibrating
+					hall_cal.hall_cal_state = CODE_HALL_CALIBRATING; // calibrating
 					/*----- convert theta_mech to 0~359.9999deg -----*/
 					hall_cal.hall_present_pos = controller.theta_mech;
 					hall_cal.hall_cal_pcmd = controller.theta_mech;
@@ -311,21 +318,27 @@ void can_tx_rx(void){
 					hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd - _f_cal_round*2*PI_F;
 					if(hall_cal.hall_cal_pcmd < 0) hall_cal.hall_cal_pcmd = hall_cal.hall_cal_pcmd + 2*PI_F;
 					update_fsm(&state, HALL_CAL_CMD);
+					pack_reply_hall_cal(can_rx, &can_tx, VERSION_NUM, state.state);
 					break;
-				case 4:  // MOTOR Mode -> Only enter motor mode without changing the controller commands
-					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
+
+				case FC_ENTER_MOTOR:
 					update_fsm(&state, MOTOR_CMD);
+					pack_reply_default(can_rx, &can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state);	// Pack response
 					break;
-				case 5:  // MOTOR_UPDATE Mode -> send controller commands (useless before entering the motor mode)
-					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
-					unpack_cmd(can_rx, controller.commands);	// Unpack commands
+
+				case FC_CONTROL_CMD:
+					pack_reply_default(can_rx, &can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state);	// Pack response
+					unpack_control_cmd(can_rx, controller.commands);	// Unpack commands
+
 					controller.timeout = 0;					    // Reset timeout counter
 					controller.i_mag_max = controller.i_q;
 					break;
+
 				default:
-					pack_reply(&can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state, controller.i_q_des);	// Pack response
+					pack_reply_default(can_rx, &can_tx, comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR, VERSION_NUM, hall_cal.hall_cal_state, state.state);	// Pack response
 					break;
 			}
+
 		can_tx.tx_header.StdId = can_rx.rx_header.StdId | 0x400;
 		HAL_CAN_AddTxMessage(&CAN_H, &can_tx.tx_header, can_tx.data, &TxMailbox);	// Send response
 	}
