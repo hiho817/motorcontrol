@@ -4,6 +4,12 @@ fsm.c:155:7:fsm_exit_state	16	static
 fsm.c:216:7:update_fsm	32	static
 fsm.c:288:7:enter_menu_state	8	static
 fsm.c:304:7:enter_setup_state	24	static
+<<<<<<< HEAD
 fsm.c:334:7:process_user_input	24	static
 fsm.c:445:7:enter_motor_mode	16	static
 fsm.c:460:7:hall_calibrate	16	static
+=======
+fsm.c:333:7:process_user_input	24	static
+fsm.c:444:7:enter_motor_mode	16	static
+fsm.c:459:7:hall_calibrate	16	static
+>>>>>>> 8f77265f16b0bb743415bc05c302a96bbb45c7aa

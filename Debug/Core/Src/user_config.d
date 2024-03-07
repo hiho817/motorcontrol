@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Core/Src/user_config.o: ../Core/Src/user_config.c ../Core/Inc/structs.h \
  ../Core/Inc/spi.h ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
@@ -134,5 +135,9 @@ Core/Src/user_config.o: ../Core/Src/user_config.c ../Core/Inc/structs.h \
 ../Core/Inc/calibration.h:
 
 ../Core/Inc/can.h:
+=======
+Core/Src/user_config.o: ../Core/Src/user_config.c \
+ ../Core/Inc/user_config.h
+>>>>>>> 8f77265f16b0bb743415bc05c302a96bbb45c7aa
 
 ../Core/Inc/user_config.h:
