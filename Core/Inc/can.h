@@ -46,8 +46,8 @@ extern CAN_HandleTypeDef hcan1;
 //#define KI_MAX 10.0f
 #define KD_MIN 0.0f
 //#define KD_MAX 5.0f
-#define T_MIN -18.0f
-#define T_MAX 18.0f
+//#define T_MIN -18.0f
+//#define T_MAX 18.0f
 #define VB_MIN 0.0f
 #define VB_MAX 40.0f
 #define SENSE_BUFFER 0.0f
@@ -78,6 +78,11 @@ typedef struct{
 	uint8_t data[8];
 	CAN_TxHeaderTypeDef tx_header;
 }CANTxMessage ;
+
+union RegData {
+    int intValue;
+    float floatValue;
+};
 
 void can_rx_init(CANRxMessage *msg);
 void can_tx_init(CANTxMessage *msg);

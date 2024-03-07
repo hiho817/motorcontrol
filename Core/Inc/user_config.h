@@ -120,8 +120,8 @@ extern "C" {
 
 #define NAME_P_MIN				"P_MIN"								// Position setpoint lower limit (rad)
 #define ADDR_P_MIN				19									// Position setpoint lower limit (rad)
-#define CMD_P_MIN				' '									// Position setpoint lower limit (rad)
-#define MIN_P_MIN				0.0f								// Position setpoint lower limit (rad)
+#define CMD_P_MIN				'_'									// Position setpoint lower limit (rad)
+#define MIN_P_MIN				GLOBAL_MIN_VALUE								// Position setpoint lower limit (rad)
 #define MAX_P_MIN				0.0f								// Position setpoint lower limit (rad)
 
 #define NAME_P_MAX				"P_MAX"								// Position setupoint upper bound (rad)
@@ -132,7 +132,7 @@ extern "C" {
 
 #define NAME_V_MIN				"V_MIN"								// Velocity setpoint lower bound (rad/s)
 #define ADDR_V_MIN				21									// Velocity setpoint lower bound (rad/s)
-#define CMD_V_MIN				' '									// Velocity setpoint lower bound (rad/s)
+#define CMD_V_MIN				'_'									// Velocity setpoint lower bound (rad/s)
 #define MIN_V_MIN				GLOBAL_MIN_VALUE					// Velocity setpoint lower bound (rad/s)
 #define MAX_V_MIN				0.0f								// Velocity setpoint lower bound (rad/s)
 
@@ -142,32 +142,44 @@ extern "C" {
 #define MIN_V_MAX				0.0f								// Velocity setpoint upper bound (rad/s)
 #define MAX_V_MAX				GLOBAL_MAX_VALUE					// Velocity setpoint upper bound (rad/s)
 
+#define NAME_T_MIN     			"T_MIN"
+#define ADDR_T_MIN			    23
+#define CMD_T_MIN		     	'_'
+#define MIN_T_MIN		     	GLOBAL_MIN_VALUE
+#define MAX_T_MIN		     	0.0f
+
+#define NAME_T_MAX     			"T_MAX"
+#define ADDR_T_MAX			    24
+#define CMD_T_MAX		     	'T'
+#define MIN_T_MAX		     	0.0f
+#define MAX_T_MAX		     	GLOBAL_MAX_VALUE
+
 #define NAME_KP_MAX				"KP_MAX"							// Max position gain (N-m/rad)
-#define ADDR_KP_MAX				23									// Max position gain (N-m/rad)
+#define ADDR_KP_MAX				25									// Max position gain (N-m/rad)
 #define CMD_KP_MAX				'k'									// Max position gain (N-m/rad)
 #define MIN_KP_MAX				0.0f								// Max position gain (N-m/rad)
 #define MAX_KP_MAX				GLOBAL_MAX_VALUE					// Max position gain (N-m/rad)
 
 #define NAME_KI_MAX				"KI_MAX"
-#define ADDR_KI_MAX				24
+#define ADDR_KI_MAX				26
 #define CMD_KI_MAX				'i'
 #define MIN_KI_MAX				0.0f
 #define MAX_KI_MAX				GLOBAL_MAX_VALUE
 
 #define NAME_KD_MAX				"KD_MAX"							// Max velocity gain (N-m/rad/s)
-#define ADDR_KD_MAX				25									// Max velocity gain (N-m/rad/s)
+#define ADDR_KD_MAX				27									// Max velocity gain (N-m/rad/s)
 #define CMD_KD_MAX				'd'									// Max velocity gain (N-m/rad/s)
 #define MIN_KD_MAX				0.0f								// Max velocity gain (N-m/rad/s)
 #define MAX_KD_MAX				GLOBAL_MAX_VALUE					// Max velocity gain (N-m/rad/s)
 
 #define NAME_HALL_CAL_OFFSET    "HALL_CAL_OFFSET"
-#define ADDR_HALL_CAL_OFFSET    26
+#define ADDR_HALL_CAL_OFFSET    28
 #define CMD_HALL_CAL_OFFSET    	'e'
 #define MIN_HALL_CAL_OFFSET    	0.0f
 #define MAX_HALL_CAL_OFFSET    	143.0f
 
 #define NAME_HALL_CAL_SPEED     "HALL_CAL_SPEED"
-#define ADDR_HALL_CAL_SPEED     27
+#define ADDR_HALL_CAL_SPEED     29
 #define CMD_HALL_CAL_SPEED     	'h'
 #define MIN_HALL_CAL_SPEED     	0.0f
 #define MAX_HALL_CAL_SPEED     	10.0f
@@ -194,6 +206,8 @@ extern "C" {
 #define P_MAX					__float_reg[ADDR_P_MAX]				// Position setupoint upper bound (rad)
 #define V_MIN					__float_reg[ADDR_V_MIN]				// Velocity setpoint lower bound (rad/s)
 #define V_MAX					__float_reg[ADDR_V_MAX]				// Velocity setpoint upper bound (rad/s)
+#define T_MIN			        __float_reg[ADDR_T_MIN]
+#define T_MAX			        __float_reg[ADDR_T_MAX]
 #define KP_MAX					__float_reg[ADDR_KP_MAX]			// Max position gain (N-m/rad)
 #define KI_MAX					__float_reg[ADDR_KI_MAX]
 #define KD_MAX					__float_reg[ADDR_KD_MAX]			// Max velocity gain (N-m/rad/s)
@@ -223,7 +237,7 @@ extern "C" {
 #define ADDR_CAN_TIMEOUT        3			                        // CAN bus timeout period
 #define CMD_CAN_TIMEOUT        	'o'			                        // CAN bus timeout period
 #define MIN_CAN_TIMEOUT        	0			                        // CAN bus timeout period
-#define MAX_CAN_TIMEOUT        	GLOBAL_MAX_VALUE                    // CAN bus timeout period
+#define MAX_CAN_TIMEOUT        	100000			                    // CAN bus timeout period
 
 #define NAME_M_ZERO				"M_ZERO"
 #define ADDR_M_ZERO				4

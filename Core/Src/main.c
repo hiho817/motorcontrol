@@ -168,6 +168,8 @@ int main(void)
   if(isnan(P_MIN))                                 {P_MIN = 0.0f;}
   if(isnan(V_MAX))                                 {V_MAX = 45.0f;}
   if(isnan(V_MIN))                                 {V_MIN = -45.0f;}
+  if(isnan(T_MAX))                                 {T_MAX = 20.0f;}
+  if(isnan(T_MIN))                                 {T_MIN = -20.0f;}
   if(isnan(KP_MAX) || KP_MAX==-1)                  {KP_MAX = 500.0f;}
   if(isnan(KI_MAX) || KI_MAX==-1)                  {KI_MAX = 0.0f;}
   if(isnan(KD_MAX) || KD_MAX==-1)                  {KD_MAX = 5.0f;}

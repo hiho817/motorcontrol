@@ -5,6 +5,7 @@
  *      Author: yisyuan
  */
 
+#include "structs.h"
 #include "user_config.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -128,6 +129,16 @@ void user_config_initialize(void){
 	float_reg_config[ADDR_V_MAX].f_MIN				= MIN_V_MAX;
 	float_reg_config[ADDR_V_MAX].f_MAX				= MAX_V_MAX;
 
+	float_reg_config[ADDR_T_MIN].name				= NAME_T_MIN;
+	float_reg_config[ADDR_T_MIN].cmd				= CMD_T_MIN;
+	float_reg_config[ADDR_T_MIN].f_MIN				= MIN_T_MIN;
+	float_reg_config[ADDR_T_MIN].f_MAX				= MAX_T_MIN;
+
+	float_reg_config[ADDR_T_MAX].name				= NAME_T_MAX;
+	float_reg_config[ADDR_T_MAX].cmd				= CMD_T_MAX;
+	float_reg_config[ADDR_T_MAX].f_MIN				= MIN_T_MAX;
+	float_reg_config[ADDR_T_MAX].f_MAX				= MAX_T_MAX;
+
 	float_reg_config[ADDR_KP_MAX].name				= NAME_KP_MAX;
 	float_reg_config[ADDR_KP_MAX].cmd				= CMD_KP_MAX;
 	float_reg_config[ADDR_KP_MAX].f_MIN				= MIN_KP_MAX;
@@ -204,6 +215,18 @@ char* float_reg_update_uart(char cmd, const char *c_data){
 			if ((float_reg_config[i].f_MIN > f_data) || (float_reg_config[i].f_MAX < f_data)){
 				return STR_INVALID_VALUE;
 			}
+			else if (i == ADDR_V_MAX){
+				__float_reg[ADDR_V_MAX] = f_data;
+				__float_reg[ADDR_V_MIN] = -f_data;
+                sprintf(response, "%s set to %f\r\n", float_reg_config[i].name, f_data);
+				return response;
+			}
+			else if (i == ADDR_T_MAX){
+				__float_reg[ADDR_T_MAX] = f_data;
+				__float_reg[ADDR_T_MIN] = -f_data;
+                sprintf(response, "%s set to %f\r\n", float_reg_config[i].name, f_data);
+				return response;
+			}
 			else{
 				__float_reg[i] = f_data;
                 sprintf(response, "%s set to %f\r\n", float_reg_config[i].name, f_data);
@@ -225,7 +248,13 @@ int float_reg_update_can(int addr, float f_data){
 		return CODE_INVALID_VALUE;
 	}
 	else{
-		__float_reg[addr] = f_data;
+		if (__float_reg[addr] != f_data){
+			__float_reg[addr] = f_data;
+			if (!preference_writer_ready(prefs)){ preference_writer_open(&prefs);}
+			preference_writer_flush(&prefs);
+			preference_writer_close(&prefs);
+			preference_writer_load(prefs);
+		}
 		return CODE_CONFIG_SUCCESS;
 	}
 }
@@ -256,11 +285,18 @@ int int_reg_update_can(int addr, int i_data){
 	else if (int_reg_config[addr].cmd == ' '){
 		return CODE_READ_ONLY;
 	}
-	else if ((int_reg_config[addr].i_MIN > i_data) || (int_reg_config[addr].i_MAX < i_data)){
+	else if (((int_reg_config[addr].i_MIN > i_data) || (int_reg_config[addr].i_MAX < i_data)) ||
+			((addr == ADDR_HALL_CAL_DIR) && (i_data == 0))){
 		return CODE_INVALID_VALUE;
 	}
 	else{
-		__int_reg[addr] = i_data;
+		if (__int_reg[addr] != i_data){
+			__int_reg[addr] = i_data;
+			if (!preference_writer_ready(prefs)){ preference_writer_open(&prefs);}
+			preference_writer_flush(&prefs);
+			preference_writer_close(&prefs);
+			preference_writer_load(prefs);
+		}
 		return CODE_CONFIG_SUCCESS;
 	}
 }
