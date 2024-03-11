@@ -123,6 +123,9 @@
 				if (fsmstate->print_uart_msg){
 					printf("\r\nEntering Motor Mode\r\n");
 				}
+				controller.kp = 5.0f ;
+				controller.ki = 0.0f ;
+				controller.kd = 1.0f ;
 				enter_motor_mode();
 				break;
 			case ENCODER_CALIBRATE:
@@ -258,6 +261,8 @@
 				case HALL_CAL_CMD:
 					fsmstate->next_state = HALL_CALIBRATE;
 					fsmstate->ready = 0;
+					break;
+				default:
 					break;
 				}
 			break;
