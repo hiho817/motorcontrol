@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2023 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under BSD 3-Clause license,
@@ -19,9 +19,9 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "can.h"
-#include "structs.h"
 
 /* USER CODE BEGIN 0 */
+#include "structs.h"
 #include "hw_config.h"
 #include "user_config.h"
 #include "math_ops.h"
