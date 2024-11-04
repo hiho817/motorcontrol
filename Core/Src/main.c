@@ -157,34 +157,34 @@ int main(void)
   preference_writer_init(&prefs, 6);
   preference_writer_load(prefs);
 
-  /* Sanitize configs in case flash is empty*/
-  if(E_ZERO==-1)                                   {E_ZERO = 0;}
-  if(M_ZERO==-1)                                   {M_ZERO = 0;}
-  if(isnan(GR) || GR==-1)                          {GR = 6.0f;}
-  if(isnan(KT) || KT==-1)                          {KT = 0.08f;}
-  if(isnan(I_BW) || I_BW==-1)                      {I_BW = 1000;}
-  if(isnan(I_MAX) || I_MAX ==-1)                   {I_MAX = 40;}
-  if(isnan(P_MAX))                                 {P_MAX = 6.283f;}
-  if(isnan(P_MIN))                                 {P_MIN = 0.0f;}
-  if(isnan(V_MAX))                                 {V_MAX = 45.0f;}
-  if(isnan(V_MIN))                                 {V_MIN = -45.0f;}
-  if(isnan(T_MAX))                                 {T_MAX = 20.0f;}
-  if(isnan(T_MIN))                                 {T_MIN = -20.0f;}
-  if(isnan(KP_MAX) || KP_MAX==-1)                  {KP_MAX = 500.0f;}
-  if(isnan(KI_MAX) || KI_MAX==-1)                  {KI_MAX = 0.0f;}
-  if(isnan(KD_MAX) || KD_MAX==-1)                  {KD_MAX = 5.0f;}
-  if(isnan(I_FW_MAX) || I_FW_MAX ==-1)             {I_FW_MAX = 0.0f;}
-  if(isnan(I_MAX_CONT) || I_MAX_CONT==-1)          {I_MAX_CONT = 14.0f;}
-  if(isnan(I_CAL) || I_CAL==-1)                    {I_CAL = 5.0f;}
-  if(HALL_CAL_DIR != 1 && HALL_CAL_DIR != -1)      {HALL_CAL_DIR = 1;}
-  if(isnan(HALL_CAL_OFFSET) || HALL_CAL_OFFSET==-1){HALL_CAL_OFFSET = 0.0f;}
-  if(isnan(HALL_CAL_SPEED) || HALL_CAL_SPEED==-1)  {HALL_CAL_SPEED = 0.25f;}
-  if(CAN_ID==-1)                                   {CAN_ID = 1;}
-  if(CAN_MASTER==-1)                               {CAN_MASTER = 0;}
-  if(CAN_TIMEOUT==-1)                              {CAN_TIMEOUT = 0;}
-  if(isnan(R_NOMINAL) || R_NOMINAL==-1)            {R_NOMINAL = 0.0f;}
-  if(isnan(TEMP_MAX) || TEMP_MAX==-1)              {TEMP_MAX = 125.0f;}
-  if(isnan(PPAIRS) || PPAIRS==-1)                  {PPAIRS = 21.0f;}
+  /* Sanitize configs in case flash is empty or is wrong value*/
+  if(                          MIN_E_ZERO > E_ZERO                   || MAX_E_ZERO < E_ZERO)                   {E_ZERO = 0;}
+  if(                          MIN_M_ZERO > M_ZERO                   || MAX_M_ZERO < M_ZERO)                   {M_ZERO = 0;}
+  if(isnan(GR)              || MIN_GR > GR		                     || MAX_GR < GR)                 		   {GR = 6.0f;}
+  if(isnan(KT)	            || MIN_KT > KT                           || MAX_KT < KT)                           {KT = 0.08f;}
+  if(isnan(I_BW)            || MIN_I_BW > I_BW                       || MAX_I_BW < I_BW)				       {I_BW = 1000;}
+  if(isnan(I_MAX)           || MIN_I_MAX > I_MAX                     || MAX_I_MAX < I_MAX)					   {I_MAX = 40;}
+  if(isnan(P_MAX)           || MIN_P_MAX > P_MAX                     || MAX_P_MAX < P_MAX)	                   {P_MAX = 6.283f;}
+  if(isnan(P_MIN)           || MIN_P_MIN > P_MIN                     || MAX_P_MIN < P_MIN)	                   {P_MIN = 0.0f;}
+  if(isnan(V_MAX)           || MIN_V_MAX > V_MAX                     || MAX_V_MAX < V_MAX)	                   {V_MAX = 45.0f;}
+  if(isnan(V_MIN)           || MIN_V_MIN > V_MIN                     || MAX_V_MIN < V_MIN)	                   {V_MIN = -45.0f;}
+  if(isnan(T_MAX)           || MIN_T_MAX > T_MAX                     || MAX_T_MAX < T_MAX)                     {T_MAX = 20.0f;}
+  if(isnan(T_MIN)           || MIN_T_MIN > T_MIN                     || MAX_T_MIN < T_MIN)	                   {T_MIN = -20.0f;}
+  if(isnan(KP_MAX)          || MIN_KP_MAX > KP_MAX                   || MAX_KP_MAX < KP_MAX)			       {KP_MAX = 500.0f;}
+  if(isnan(KI_MAX)          || MIN_KI_MAX > KI_MAX                   || MAX_KI_MAX < KI_MAX)      			   {KI_MAX = 0.0f;}
+  if(isnan(KD_MAX)          || MIN_KD_MAX > KD_MAX                   || MAX_KD_MAX < KD_MAX)				   {KD_MAX = 5.0f;}
+  if(isnan(I_FW_MAX)        || MIN_I_FW_MAX > I_FW_MAX               || MAX_I_FW_MAX < I_FW_MAX)			   {I_FW_MAX = 0.0f;}
+  if(isnan(I_MAX_CONT)      || MIN_I_MAX_CONT > I_MAX_CONT           || MAX_I_MAX_CONT < I_MAX_CONT)           {I_MAX_CONT = 14.0f;}
+  if(isnan(I_CAL)           || MIN_I_CAL > I_CAL                     || MAX_I_CAL < I_CAL)					   {I_CAL = 5.0f;}
+  if(HALL_CAL_DIR != 1 && HALL_CAL_DIR != -1)												      			   {HALL_CAL_DIR = 1;}
+  if(isnan(HALL_CAL_OFFSET) || MIN_HALL_CAL_OFFSET > HALL_CAL_OFFSET || MAX_HALL_CAL_OFFSET < HALL_CAL_OFFSET) {HALL_CAL_OFFSET = 0.0f;}
+  if(isnan(HALL_CAL_SPEED)  || MIN_HALL_CAL_SPEED > HALL_CAL_SPEED   || MAX_HALL_CAL_SPEED < HALL_CAL_SPEED)   {HALL_CAL_SPEED = 0.25f;}
+  if(						   MIN_CAN_ID > CAN_ID                   || MAX_CAN_ID < CAN_ID)                   {CAN_ID = 1;}
+  if(                          MIN_CAN_MASTER > CAN_MASTER           || MAX_CAN_MASTER < CAN_MASTER)           {CAN_MASTER = 0;}
+  if(                          MIN_CAN_TIMEOUT > CAN_TIMEOUT         || MAX_CAN_TIMEOUT < CAN_TIMEOUT)         {CAN_TIMEOUT = 0;}
+  if(isnan(R_NOMINAL)       || MIN_R_NOMINAL > R_NOMINAL             || MAX_R_NOMINAL < R_NOMINAL)             {R_NOMINAL = 0.0f;}
+  if(isnan(TEMP_MAX)        || MIN_TEMP_MAX > TEMP_MAX               || MAX_TEMP_MAX < TEMP_MAX)               {TEMP_MAX = 125.0f;}
+  if(isnan(PPAIRS)          || MIN_PPAIRS > PPAIRS                   || MAX_PPAIRS < PPAIRS)                   {PPAIRS = 21.0f;}
 
   user_config_initialize();
 
@@ -274,7 +274,7 @@ int main(void)
   state.state = MENU_MODE;
   state.next_state = MENU_MODE;
   state.ready = 1;
-  state.print_uart_msg = 1;
+  state.print_uart_msg = 0;
   enter_menu_state();
 
 

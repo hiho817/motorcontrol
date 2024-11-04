@@ -248,15 +248,7 @@
 					fsmstate->ready = 0;
 					break;
 				case ZERO_CMD:
-					comm_encoder.m_zero = 0;
-					ps_sample(&comm_encoder, DT);
-					int zero_count = comm_encoder.count;
-					M_ZERO = zero_count;
-					if (!preference_writer_ready(prefs)){ preference_writer_open(&prefs);}
-					preference_writer_flush(&prefs);
-					preference_writer_close(&prefs);
-					preference_writer_load(prefs);
-					printf("\n\r  Saved new zero position:  %d\n\r\n\r", M_ZERO);
+					encoder_set_zero();
 					break;
 				case HALL_CAL_CMD:
 					fsmstate->next_state = HALL_CALIBRATE;
@@ -462,6 +454,16 @@
  }
 
 
+ void encoder_set_zero(void){
+	comm_encoder.m_zero = 0;
+	comm_encoder.first_sample = 0;
+	int zero_count = comm_encoder.count;
+	M_ZERO = zero_count;
+	ps_sample(&comm_encoder, DT);
+	controller.theta_mech = 0;
+ }
+
+
  void hall_calibrate(FSMStruct * fsmstate){
      if(hall_cal.hall_cal_state == CODE_HALL_UNCALIBRATED || hall_cal.hall_cal_state >= CODE_HALL_CAL_SUCCESS );
      else{
@@ -497,6 +499,7 @@
                     		 hall_cal.hall_cal_state = CODE_HALL_CAL_SUCCESS; // success
                              // zero
                     		 hall_cal.hall_cal_count = 0 ;
+                    		 encoder_set_zero();
                     		 fsmstate->next_state = MOTOR_MODE ;
                          }
                      }
@@ -508,6 +511,7 @@
                         	 hall_cal.hall_cal_state = CODE_HALL_CAL_SUCCESS; // success
                              // zero
                              hall_cal.hall_cal_count = 0 ;
+                    		 encoder_set_zero();
                     		 fsmstate->next_state = MOTOR_MODE ;
                          }
                      }
@@ -522,6 +526,7 @@
                         	 hall_cal.hall_cal_state = CODE_HALL_CAL_SUCCESS; // success
                              // zero
                              hall_cal.hall_cal_count = 0 ;
+                    		 encoder_set_zero();
                     		 fsmstate->next_state = MOTOR_MODE ;
                          }
                      }
@@ -534,6 +539,7 @@
                         	 hall_cal.hall_cal_state = CODE_HALL_CAL_SUCCESS; // success
                              // zero
                              hall_cal.hall_cal_count = 0 ;
+                    		 encoder_set_zero();
                     		 fsmstate->next_state = MOTOR_MODE ;
                          }
                      }

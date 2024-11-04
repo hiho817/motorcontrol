@@ -298,7 +298,8 @@ void torque_control(ControllerStruct *controller){
 	}
 
 	/*----- position PID control -----*/
-	static float in_err = 0, err = 0; //integral of position error
+	static float err = 0; //integral of position error
+
 	if(controller->p_des < pos){
 		if((controller->p_des + 2*PI_F - pos) < (pos - controller->p_des)){
 			err = 2*PI_F - pos + controller->p_des;

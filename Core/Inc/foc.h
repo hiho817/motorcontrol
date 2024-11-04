@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include "position_sensor.h"
 
+static float in_err = 0;
 
 typedef struct{
 	uint32_t tim_ch_w;								// Terminal W timer channel

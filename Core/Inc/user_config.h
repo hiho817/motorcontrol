@@ -60,7 +60,7 @@ extern "C" {
 
 #define NAME_I_MAX_CONT        	"I_MAX_CONT"                        // Continuous max current
 #define ADDR_I_MAX_CONT        	9                                   // Continuous max current
-#define CMD_I_MAX_CONT         	' '                                 // Continuous max current
+#define CMD_I_MAX_CONT         	'c'                                 // Continuous max current
 #define MIN_I_MAX_CONT         	GLOBAL_MIN_VALUE                    // Continuous max current
 #define MAX_I_MAX_CONT         	GLOBAL_MAX_VALUE                    // Continuous max current
 
