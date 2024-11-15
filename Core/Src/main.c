@@ -290,7 +290,7 @@ int main(void)
   {
 
 	  HAL_Delay(100);
-	  drv_print_faults(drv);
+	 // drv_print_faults(drv);
 	 // if(state.state==MOTOR_MODE){
 	  	  //printf("%.2f %.2f %.2f %.2f %.2f\r\n", controller.p_des, controller.v_des, controller.kp, controller.kd, controller.t_ff);
 	  //}
