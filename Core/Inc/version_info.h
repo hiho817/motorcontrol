@@ -8,11 +8,11 @@
 #ifndef VERSION_INFO_H_
 #define VERSION_INFO_H_
 
-#define FIRMWARE_VERSION   "5.2.1"
+#define FIRMWARE_VERSION   "5.2.2"
 #define FIRMWARE_DATE      __DATE__
 #define FIRMWARE_TIME      __TIME__
 #define AUTHOR_NAME        "Yi-Syuan, Shen (r12522823)"
 
-#define MODIFICATION_INFO  "Pull down USART2 GPIO setting in .ioc file"
+#define MODIFICATION_INFO  "Modify the priority of USART."
 
 #endif /* VERSION_INFO_H_ */
