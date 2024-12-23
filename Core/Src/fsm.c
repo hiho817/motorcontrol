@@ -146,9 +146,9 @@
 				if (fsmstate->print_uart_msg){
 					printf("\r\nEntering Hall Calibration Mode\r\n");
 				}
-				controller.kp = 5.0f ;
+				controller.kp = 50.0f ;
 				controller.ki = 0.0f ;
-				controller.kd = 1.0f ;
+				controller.kd = 1.5f ;
 				enter_motor_mode();
 				break;
 

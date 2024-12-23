@@ -8,11 +8,11 @@
 #ifndef VERSION_INFO_H_
 #define VERSION_INFO_H_
 
-#define FIRMWARE_VERSION   "5.2.3"
+#define FIRMWARE_VERSION   "5.2.4"
 #define FIRMWARE_DATE      __DATE__
 #define FIRMWARE_TIME      __TIME__
 #define AUTHOR_NAME        "Yi-Syuan, Shen (r12522823)"
 
-#define MODIFICATION_INFO  "Comment the drv_print_faults function."
+#define MODIFICATION_INFO  "Adjust PID values of Hall Calibrate."
 
 #endif /* VERSION_INFO_H_ */
